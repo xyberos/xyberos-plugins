@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "xyberos-documents"
+version = "0.1.0"
+description = "Filesystem + document loaders plugin (M1): PDF, DOCX, HTML, CSV, XLSX -> IngestingKnowledge"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "Apache-2.0"}
+dependencies = ["xyberos>=1.0"]
+keywords = ["xyberos", "plugin", "documents", "loader", "knowledge", "ingestion"]
+
+[project.optional-dependencies]
+documents = [
+    "pypdf",
+    "python-docx",
+    "openpyxl",
+]
+test = [
+    "pytest",
+]
+
+[project.entry-points."xyberos.plugins"]
+documents = "xyberos_documents.plugin:plugin"
+
+[tool.setuptools]
+packages = ["xyberos_documents"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

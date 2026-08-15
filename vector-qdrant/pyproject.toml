@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "xyberos-qdrant"
+version = "0.1.0"
+description = "Qdrant VectorStore plugin (RFC-0019, M4): hosted or in-memory Qdrant as an xyberos VectorStore"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "Apache-2.0"}
+dependencies = ["xyberos>=1.0"]
+keywords = ["xyberos", "plugin", "vector", "qdrant", "rag"]
+
+[project.optional-dependencies]
+vectors = ["qdrant-client"]
+test = ["pytest"]
+
+[project.entry-points."xyberos.plugins"]
+qdrant = "xyberos_qdrant.plugin:plugin"
+
+[tool.setuptools]
+packages = ["xyberos_qdrant"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

@@ -1,0 +1,79 @@
+{
+  "name": "github",
+  "base_url": "https://api.github.com",
+  "description": "GitHub REST API. A GITHUB_TOKEN env var is optional (raises the rate limit).",
+  "headers": {
+    "Accept": "application/vnd.github+json",
+    "User-Agent": "xyberos-http-api-example",
+    "X-GitHub-Api-Version": "2022-11-28"
+  },
+  "auth": {
+    "type": "bearer",
+    "token_env": "GITHUB_TOKEN"
+  },
+  "rate_limit": {
+    "calls_per_second": 5,
+    "burst": 10
+  },
+  "operations": [
+    {
+      "name": "get_user",
+      "method": "GET",
+      "path": "/users/{username}",
+      "description": "Get a GitHub user's public profile.",
+      "params": [
+        {
+          "name": "username",
+          "in": "path",
+          "required": true,
+          "description": "GitHub username"
+        }
+      ]
+    },
+    {
+      "name": "list_repos",
+      "method": "GET",
+      "path": "/users/{username}/repos",
+      "description": "List a GitHub user's public repositories.",
+      "params": [
+        {
+          "name": "username",
+          "in": "path",
+          "required": true
+        },
+        {
+          "name": "per_page",
+          "in": "query",
+          "type": "integer",
+          "default": 30,
+          "description": "Results per page (max 100)"
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "type": "string",
+          "default": "updated",
+          "description": "Sort field"
+        }
+      ]
+    },
+    {
+      "name": "get_repo",
+      "method": "GET",
+      "path": "/repos/{owner}/{repo}",
+      "description": "Get a single repository's metadata.",
+      "params": [
+        {
+          "name": "owner",
+          "in": "path",
+          "required": true
+        },
+        {
+          "name": "repo",
+          "in": "path",
+          "required": true
+        }
+      ]
+    }
+  ]
+}

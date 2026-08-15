@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "xyberos-http-api"
+version = "0.1.0"
+description = "Generic HTTP/API connector plugin (M2): point at any REST API, get typed tools"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "Apache-2.0"}
+dependencies = ["xyberos>=1.0"]
+keywords = ["xyberos", "plugin", "http", "api", "rest", "tool"]
+
+[project.entry-points."xyberos.plugins"]
+http_api = "xyberos_http_api.plugin:plugin"
+
+[tool.setuptools]
+packages = ["xyberos_http_api"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

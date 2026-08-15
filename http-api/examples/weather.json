@@ -1,0 +1,53 @@
+{
+  "name": "weather",
+  "base_url": "https://api.open-meteo.com/v1",
+  "description": "Open-Meteo weather API (no API key required).",
+  "rate_limit": {
+    "calls_per_second": 2,
+    "burst": 5
+  },
+  "operations": [
+    {
+      "name": "get_forecast",
+      "method": "GET",
+      "path": "/forecast",
+      "description": "Get the current weather forecast for a latitude/longitude pair.",
+      "params": [
+        {
+          "name": "latitude",
+          "in": "query",
+          "type": "number",
+          "required": true,
+          "description": "Latitude of the location"
+        },
+        {
+          "name": "longitude",
+          "in": "query",
+          "type": "number",
+          "required": true,
+          "description": "Longitude of the location"
+        },
+        {
+          "name": "current_weather",
+          "in": "query",
+          "type": "boolean",
+          "default": true,
+          "description": "Include the current weather block"
+        },
+        {
+          "name": "hourly",
+          "in": "query",
+          "type": "string",
+          "description": "Comma-separated hourly variables, e.g. temperature_2m,precipitation"
+        },
+        {
+          "name": "timezone",
+          "in": "query",
+          "type": "string",
+          "default": "auto",
+          "description": "IANA timezone, default auto"
+        }
+      ]
+    }
+  ]
+}

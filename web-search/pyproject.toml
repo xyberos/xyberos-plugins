@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "xyberos-web-search"
+version = "0.1.0"
+description = "Web search abstraction plugin (RFC-0019, M5): one WebSearch contract, Tavily/Serper/Brave/Exa/Firecrawl behind it"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "Apache-2.0"}
+dependencies = ["xyberos>=1.0"]
+keywords = ["xyberos", "plugin", "web", "search", "tavily", "serper", "brave", "exa", "firecrawl"]
+
+[project.entry-points."xyberos.plugins"]
+web_search = "xyberos_web_search.plugin:plugin"
+
+[tool.setuptools]
+packages = ["xyberos_web_search"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "xyberos-redis"
+version = "0.1.0"
+description = "Redis plugin (RFC-0019, M4): RedisVectorStore + RedisMemory + cache backing for CacheResponder"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "Apache-2.0"}
+dependencies = ["xyberos>=1.0"]
+keywords = ["xyberos", "plugin", "redis", "vector", "memory", "cache", "state"]
+
+[project.optional-dependencies]
+state = ["redis"]
+test = ["pytest", "fakeredis"]
+
+[project.entry-points."xyberos.plugins"]
+redis = "xyberos_redis.plugin:plugin"
+
+[tool.setuptools]
+packages = ["xyberos_redis"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

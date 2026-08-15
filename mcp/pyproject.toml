@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "xyberos-mcp"
+version = "0.1.0"
+description = "Model Context Protocol client plugin (RFC-0019, M3): stdio + streamable HTTP, one Tool per server tool"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "Apache-2.0"}
+dependencies = ["xyberos>=1.0"]
+keywords = ["xyberos", "plugin", "mcp", "model context protocol", "tools"]
+
+[project.optional-dependencies]
+mcp = ["mcp"]  # optional official SDK; this client is stdlib-only
+test = ["pytest"]
+
+[project.entry-points."xyberos.plugins"]
+mcp = "xyberos_mcp.plugin:plugin"
+
+[tool.setuptools]
+packages = ["xyberos_mcp"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

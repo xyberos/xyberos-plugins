@@ -1,0 +1,11 @@
+{
+  "demo": {
+    "command": ["python", "examples/demo_mcp_server.py"]
+  },
+  "remote_example": {
+    "url": "https://example.com/mcp",
+    "headers": {
+      "Authorization": "Bearer YOUR_TOKEN"
+    }
+  }
+}
