@@ -8,6 +8,7 @@ Both the token provider and the transport are injectable for tests.
 
 from __future__ import annotations
 
+import importlib
 import json
 import os
 import urllib.request
@@ -23,17 +24,17 @@ TokenProvider = Callable[[], str]
 
 def _default_token() -> str:
     try:
-        import google.auth
-        import google.auth.transport.requests
+        google_auth = importlib.import_module("google.auth")
+        google_auth_requests = importlib.import_module("google.auth.transport.requests")
     except ImportError as exc:
         raise ProviderError(
             "the 'google-auth' package is required for Vertex AI; install it with "
             "'pip install xyberos[llm-providers]'"
         ) from exc
-    credentials, _ = google.auth.default(
+    credentials, _ = google_auth.default(
         scopes=["https://www.googleapis.com/auth/cloud-platform"]
     )
-    credentials.refresh(google.auth.transport.requests.Request())
+    credentials.refresh(google_auth_requests.Request())
     return str(credentials.token)
 
 

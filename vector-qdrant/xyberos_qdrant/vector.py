@@ -13,6 +13,7 @@ on query, so the :class:`VectorStore` contract (string ids) holds exactly.
 
 from __future__ import annotations
 
+import importlib
 import uuid
 from collections.abc import Mapping, Sequence
 from typing import Any
@@ -26,8 +27,8 @@ _ID_NAMESPACE = uuid.UUID("6ba7b810-9dad-11d1-80b4-00c04fd430c8")  # DNS namespa
 
 def _require_qdrant() -> Any:
     try:
-        import qdrant_client  # noqa: F401
-        import qdrant_client.models as models  # noqa: F401
+        importlib.import_module("qdrant_client")  # noqa: F401
+        models = importlib.import_module("qdrant_client.models")
     except ImportError as exc:
         raise ProviderError(
             "the 'qdrant-client' package is required; install it with "
@@ -148,7 +149,7 @@ class QdrantVectorStore(VectorStore):
     def _get_client(self) -> Any:
         if self._client is not None:
             return self._client
-        from qdrant_client import QdrantClient
+        QdrantClient = importlib.import_module("qdrant_client").QdrantClient
 
         if self._location is not None or self._path is not None:
             self._client = QdrantClient(location=self._location, path=self._path)

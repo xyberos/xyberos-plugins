@@ -13,6 +13,7 @@ missing (``pip install xyberos[vectors]``).
 
 from __future__ import annotations
 
+import importlib
 from collections.abc import Mapping, Sequence
 from typing import Any
 
@@ -22,7 +23,7 @@ from xyberos.exceptions.provider import ProviderError
 
 def _require_faiss() -> Any:
     try:
-        import faiss
+        faiss = importlib.import_module("faiss")
     except ImportError as exc:
         raise ProviderError(
             "the 'faiss-cpu' package is required; install it with "
@@ -93,11 +94,11 @@ class FaissVectorStore(VectorStore):
         if index.ntotal == 0:
             return []
 
-        import numpy as np
+        numpy = importlib.import_module("numpy")
 
         query_vector = _normalize(list(vector)) if self._normalize else list(vector)
         k = min(max(top_k, 1), index.ntotal)
-        distances, indices = index.search(np.array([query_vector], dtype="float32"), k)
+        distances, indices = index.search(numpy.array([query_vector], dtype="float32"), k)
 
         ids = list(bucket.keys())
         hits: list[ScoredHit] = []
@@ -131,11 +132,11 @@ class FaissVectorStore(VectorStore):
         if not bucket:
             self._indexes.pop(namespace, None)
             return
-        import numpy as np
+        numpy = importlib.import_module("numpy")
 
         vectors = [v for v, _ in bucket.values()]
         if self._normalize:
             vectors = [_normalize(v) for v in vectors]
         index = faiss.IndexFlatIP(self._dim or len(vectors))
-        index.add(np.array(vectors, dtype="float32"))
+        index.add(numpy.array(vectors, dtype="float32"))
         self._indexes[namespace] = index

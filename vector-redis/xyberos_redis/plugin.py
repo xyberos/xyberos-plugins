@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import importlib
 import os
 from typing import Any
 
@@ -15,7 +16,7 @@ from .vector import RedisVectorStore
 
 def _require_redis() -> Any:
     try:
-        import redis
+        redis = importlib.import_module("redis")
     except ImportError as exc:
         raise ProviderError(
             "the 'redis' package is required; install it with "

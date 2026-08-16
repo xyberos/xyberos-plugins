@@ -8,6 +8,7 @@ missing. A ``client`` may be injected for tests.
 
 from __future__ import annotations
 
+import importlib
 import os
 from typing import Any
 
@@ -16,7 +17,7 @@ from xyberos.exceptions.provider import ProviderError
 
 def _require_boto3() -> Any:
     try:
-        import boto3
+        boto3 = importlib.import_module("boto3")
     except ImportError as exc:
         raise ProviderError(
             "the 'boto3' package is required for AWS Bedrock; install it with "

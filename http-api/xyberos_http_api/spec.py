@@ -8,6 +8,7 @@ which becomes one typed :class:`~xyberos.contracts.Tool`.
 
 from __future__ import annotations
 
+import importlib
 import json
 from collections.abc import Mapping
 from dataclasses import dataclass, field
@@ -139,7 +140,7 @@ class HttpApiSpec:
         text = path.read_text(encoding="utf-8")
         if path.suffix.lower() in (".yaml", ".yml"):
             try:
-                import yaml  # optional dependency
+                yaml = importlib.import_module("yaml")  # optional dependency
             except ImportError as exc:  # pragma: no cover - environment specific
                 raise ProviderError(
                     "the 'PyYAML' package is required to load YAML specs; "

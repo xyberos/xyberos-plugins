@@ -7,6 +7,7 @@ Raises a clear :class:`~xyberos.exceptions.provider.ProviderError` when
 
 from __future__ import annotations
 
+import importlib
 from pathlib import Path
 
 from xyberos.exceptions.provider import ProviderError
@@ -16,14 +17,14 @@ from .base import Document, chunk_documents
 
 def _read_xlsx(path: Path) -> tuple[str, list[str], int]:
     try:
-        from openpyxl import load_workbook
+        openpyxl = importlib.import_module("openpyxl")
     except ImportError as exc:
         raise ProviderError(
             "the 'openpyxl' package is required to load XLSX files; "
             "install it with 'pip install xyberos[documents]'"
         ) from exc
 
-    workbook = load_workbook(path, read_only=True, data_only=True)
+    workbook = openpyxl.load_workbook(path, read_only=True, data_only=True)
     try:
         sheets = workbook.sheetnames
         lines: list[str] = []

@@ -6,6 +6,7 @@ testable without ``sentry-sdk``; when not injected the SDK is imported lazily.
 
 from __future__ import annotations
 
+import importlib
 import os
 from typing import Any, Callable
 
@@ -62,7 +63,7 @@ class SentryExporter:
         global sentry_sdk  # noqa: PLW0603 - lazy module binding
         if "sentry_sdk" not in globals():
             try:
-                import sentry_sdk  # type: ignore
+                sentry_sdk = importlib.import_module("sentry_sdk")
             except ImportError as exc:
                 raise ProviderError(
                     "the 'sentry-sdk' package is required; install with "

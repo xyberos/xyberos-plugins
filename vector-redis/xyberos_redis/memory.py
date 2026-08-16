@@ -8,6 +8,7 @@ entries, oldest first, in insertion order. The list lives under
 
 from __future__ import annotations
 
+import importlib
 import json
 from datetime import datetime, timezone
 from typing import Any
@@ -19,7 +20,7 @@ from xyberos.exceptions.provider import ProviderError
 
 def _require_redis() -> Any:
     try:
-        import redis
+        redis = importlib.import_module("redis")
     except ImportError as exc:
         raise ProviderError(
             "the 'redis' package is required; install it with "

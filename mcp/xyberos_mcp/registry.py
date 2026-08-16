@@ -8,6 +8,7 @@ JSON). Each configured server is subject to the allowlist at connect time.
 
 from __future__ import annotations
 
+import importlib
 import json
 import os
 from dataclasses import dataclass, field
@@ -90,7 +91,7 @@ def _servers_from_file(path: str | Path) -> list[ServerConfig]:
     text = path.read_text(encoding="utf-8")
     if path.suffix.lower() in (".yaml", ".yml"):
         try:
-            import yaml  # optional dependency
+            yaml = importlib.import_module("yaml")  # optional dependency
         except ImportError as exc:
             raise ProviderError(
                 "the 'PyYAML' package is required to load YAML server configs; "

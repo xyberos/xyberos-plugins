@@ -7,6 +7,7 @@ Builds a default SDK ``TracerProvider`` with a ``SimpleSpanProcessor`` on an
 
 from __future__ import annotations
 
+import importlib
 from typing import Any
 
 from xyberos.events import Event
@@ -44,30 +45,31 @@ class OpenTelemetryExporter:
         if self._tracer is not None:
             return self._tracer
         try:
-            from opentelemetry import trace
-            from opentelemetry.sdk.trace import TracerProvider
+            opentelemetry_trace = importlib.import_module("opentelemetry.trace")
+            otel_sdk = importlib.import_module("opentelemetry.sdk.trace")
         except ImportError as exc:
             raise ProviderError(
                 "OpenTelemetry requires 'opentelemetry-sdk'; install with "
                 "'pip install xyberos-observability[otel]'"
             ) from exc
-        provider = TracerProvider()
+        provider = otel_sdk.TracerProvider()
         provider.add_span_processor(self._span_processor(self._get_span_exporter()))
-        self._tracer = trace.get_tracer("xyberos", tracer_provider=provider)
+        self._tracer = opentelemetry_trace.get_tracer("xyberos", tracer_provider=provider)
         return self._tracer
 
     def _get_span_exporter(self) -> Any:
         if self._span_exporter is not None:
             return self._span_exporter
         try:
-            from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
+            in_memory = importlib.import_module(
+                "opentelemetry.sdk.trace.export.in_memory_span_exporter"
+            )
         except ImportError as exc:  # pragma: no cover - guarded by _get_tracer
             raise ProviderError("OpenTelemetry SDK is not installed") from exc
-        self._span_exporter = InMemorySpanExporter()
+        self._span_exporter = in_memory.InMemorySpanExporter()
         return self._span_exporter
 
     @staticmethod
     def _span_processor(exporter: Any) -> Any:
-        from opentelemetry.sdk.trace.export import SimpleSpanProcessor
-
-        return SimpleSpanProcessor(exporter)
+        export_module = importlib.import_module("opentelemetry.sdk.trace.export")
+        return export_module.SimpleSpanProcessor(exporter)

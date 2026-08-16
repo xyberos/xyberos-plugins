@@ -5,9 +5,12 @@ from __future__ import annotations
 import base64
 import hashlib
 import hmac
+import importlib
 import json
 import time
 from typing import Any
+
+from xyberos.exceptions.provider import ProviderError
 
 from .errors import AuthError
 
@@ -99,18 +102,27 @@ class JwtCodec:
         raise AuthError(f"unsupported JWT algorithm: {alg}")
 
     def _rsa_sign(self, data: bytes) -> bytes:
-        from cryptography.hazmat.primitives import hashes, serialization
-        from cryptography.hazmat.primitives.asymmetric import padding
-
+        primitives, asymmetric, padding, serialization, hashes = self._rsa_modules()
         key = serialization.load_pem_private_key(self._private_key.encode("utf-8"), password=None)
         return key.sign(data, padding.PKCS1v15(), hashes.SHA256())
 
     def _rsa_verify(self, data: bytes, signature: bytes) -> None:
-        from cryptography.hazmat.primitives import hashes, serialization
-        from cryptography.hazmat.primitives.asymmetric import padding
-
+        primitives, asymmetric, padding, serialization, hashes = self._rsa_modules()
         key = serialization.load_pem_public_key(self._public_key.encode("utf-8"))
         try:
             key.verify(signature, data, padding.PKCS1v15(), hashes.SHA256())
         except Exception as exc:
             raise AuthError("JWT signature verification failed") from exc
+
+    @staticmethod
+    def _rsa_modules() -> tuple[Any, Any, Any, Any, Any]:
+        """Lazily import the ``cryptography`` modules for RS256 (optional dep)."""
+        try:
+            primitives = importlib.import_module("cryptography.hazmat.primitives")
+            asymmetric = importlib.import_module("cryptography.hazmat.primitives.asymmetric")
+        except ImportError as exc:
+            raise ProviderError(
+                "RS256 requires 'cryptography'; install with "
+                "'pip install xyberos-auth[rsa]'"
+            ) from exc
+        return primitives, asymmetric, asymmetric.padding, primitives.serialization, primitives.hashes

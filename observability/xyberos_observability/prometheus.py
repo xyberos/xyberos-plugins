@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import importlib
 from collections import defaultdict
 from typing import Any
 
@@ -36,13 +37,13 @@ class PrometheusExporter:
         if self._counter is not None:
             return self._counter
         try:
-            from prometheus_client import Counter
+            prometheus_client = importlib.import_module("prometheus_client")
         except ImportError as exc:
             raise ProviderError(
                 "Prometheus requires 'prometheus-client'; install with "
                 "'pip install xyberos-observability[prometheus]'"
             ) from exc
-        self._counter = Counter(
+        self._counter = prometheus_client.Counter(
             self.METRIC_NAME,
             "Xyberos events by name",
             ["event"],

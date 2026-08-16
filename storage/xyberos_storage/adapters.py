@@ -6,6 +6,7 @@ tests; OneDrive uses the Microsoft Graph REST API with an injectable transport.
 
 from __future__ import annotations
 
+import importlib
 import os
 from typing import Any
 
@@ -51,7 +52,7 @@ class S3Store:
         if self._client is not None:
             return self._client
         try:
-            import boto3
+            boto3 = importlib.import_module("boto3")
         except ImportError as exc:
             raise ProviderError(
                 "the 'boto3' package is required for S3; install with 'pip install xyberos-storage[s3]'"
@@ -77,7 +78,7 @@ class AzureBlobStore:
         if self._client is not None:
             return self._client.get_container_client(self._container)
         try:
-            from azure.storage.blob import BlobServiceClient
+            azure_blob = importlib.import_module("azure.storage.blob")
         except ImportError as exc:
             raise ProviderError(
                 "the 'azure-storage-blob' package is required; install with "
@@ -85,7 +86,7 @@ class AzureBlobStore:
             ) from exc
         if not self._connection_string:
             raise ProviderError("Azure Blob requires AZURE_STORAGE_CONNECTION_STRING")
-        return BlobServiceClient.from_connection_string(self._connection_string).get_container_client(self._container)
+        return azure_blob.BlobServiceClient.from_connection_string(self._connection_string).get_container_client(self._container)
 
     def list(self, prefix: str = "") -> list[str]:
         container = self._container_client()
@@ -113,7 +114,7 @@ class GcsStore:
         if self._client is not None:
             return self._client.bucket(self._bucket)
         try:
-            from google.cloud import storage
+            storage = importlib.import_module("google.cloud.storage")
         except ImportError as exc:
             raise ProviderError(
                 "the 'google-cloud-storage' package is required; install with "

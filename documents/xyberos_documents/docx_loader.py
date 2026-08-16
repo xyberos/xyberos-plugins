@@ -7,6 +7,7 @@ installed (``pip install xyberos[documents]``).
 
 from __future__ import annotations
 
+import importlib
 from pathlib import Path
 
 from xyberos.exceptions.provider import ProviderError
@@ -16,14 +17,14 @@ from .base import Document, chunk_documents
 
 def _read_docx(path: Path) -> tuple[str, int]:
     try:
-        from docx import Document as DocxDocument
+        docx = importlib.import_module("docx")
     except ImportError as exc:
         raise ProviderError(
             "the 'python-docx' package is required to load DOCX files; "
             "install it with 'pip install xyberos[documents]'"
         ) from exc
 
-    doc = DocxDocument(str(path))
+    doc = docx.Document(str(path))
     parts: list[str] = []
     for paragraph in doc.paragraphs:
         if paragraph.text.strip():

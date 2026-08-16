@@ -6,6 +6,7 @@ Cloud adapters use stdlib HTTP with an injectable transport; Polly lazy-imports
 
 from __future__ import annotations
 
+import importlib
 import os
 import shutil
 import subprocess
@@ -125,7 +126,7 @@ class PollyTTS:
         if self._client is not None:
             return self._client
         try:
-            import boto3
+            boto3 = importlib.import_module("boto3")
         except ImportError as exc:
             raise ProviderError(
                 "the 'boto3' package is required for AWS Polly; install it with "
