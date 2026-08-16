@@ -17,6 +17,7 @@ Each folder is an independently installable plugin that plugs into the public
 | **M7** — Community wave | [`github/`](github/) · [`gitlab/`](gitlab/) · [`slack/`](slack/) · [`discord/`](discord/) · [`notion/`](notion/) · [`jira/`](jira/) · [`linear/`](linear/) | comm / PM tools via REST+GraphQL plugins | 🟢 |
 | **M8** — Voice + vision / multimodal | [`stt/`](stt/) · [`tts/`](tts/) · [`vision/`](vision/) | STT (Whisper/Deepgram/AssemblyAI), TTS (ElevenLabs/OpenAI/Polly/Piper), vision/OCR/image-gen | 🟢 |
 | **M9** — Enterprise + infrastructure | [`auth/`](auth/) · [`storage/`](storage/) · [`db/`](db/) · [`queues/`](queues/) | OAuth2/OIDC/JWT · object storage (S3/Azure/GCS/OneDrive) · DB contract (RFC-0020) · message queues | 🟢 |
+| **M10** — Observability | [`observability/`](observability/) | OTel/Prometheus/Langfuse/Sentry as `EventBus` exporters — `app.chat(...)` → trace | 🟢 |
 
 > **Why `vector-*` folder names?** The `faiss` and `redis` third-party packages
 > are real top-level modules. A plugin folder named exactly `faiss/` or
@@ -52,6 +53,8 @@ pip install -e ./github -e ./gitlab -e ./slack -e ./discord -e ./notion -e ./jir
 pip install -e ./stt -e ./tts -e ./vision
 # enterprise + infra (M9)
 pip install -e ./auth -e ./storage -e ./db -e ./queues
+# observability (M10)
+pip install -e ./observability
 
 # run a plugin's tests from its folder
 cd http-api && python -m pytest tests -q
@@ -73,3 +76,4 @@ python -c "from xyberos import create_app; app = create_app(); print(app.load_en
 - **M5** is a **Plugin** (thin `urllib` adapters).
 - **M6** is a **Plugin** / `[llm-providers]` extra — presets reuse the core
   `OpenAICompatibleLLM` (no new architecture per provider).
+- **M10** is a **Plugin** — thin `EventBus` exporters (`[otel]`/`[prometheus]`/`[sentry]` extras).

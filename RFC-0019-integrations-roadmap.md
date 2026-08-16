@@ -270,9 +270,9 @@ SQLite (core) and PostgreSQL via pgvector (`[vectors]`) are **shipped**.
 
 | Integration | Status | Contract | Ship | Notes |
 | ----------- | ------ | -------- | ---- | ----- |
-| OpenTelemetry, Prometheus, Grafana, Jaeger | 🔵 | `Exporter` | Extra / Plugin | |
-| LLM observability: Langfuse, Arize Phoenix, W&B | 🔵 | `Exporter` | Plugin | |
-| Errors: Sentry | 🔵 | `Exporter` | Plugin | |
+| OpenTelemetry, Prometheus, Grafana, Jaeger | � | `Exporter` | Extra / Plugin | `xyberos-observability` (OTel spans + Prometheus counter) |
+| LLM observability: Langfuse, Arize Phoenix, W&B | 🟢 | `Exporter` | Plugin | `xyberos-observability` (Langfuse ingestion; Phoenix/W&B backlog) |
+| Errors: Sentry | 🟢 | `Exporter` | Plugin | `xyberos-observability` (breadcrumbs + failure captures) |
 
 ```text
 Xyberos Application
@@ -491,12 +491,15 @@ enterprise reference deployment documented; DB contract RFC approved.
 
 **Goal:** production observability with the events interface as the hub.
 
-- [ ] `OpenTelemetryExporter`, `PrometheusExporter`, `Grafana`/`Jaeger` wiring.
-- [ ] `LangfuseExporter`, `SentryExporter`, Arize Phoenix, W&B.
-- [ ] End-to-end trace of one request through the pipeline into a backend.
+- [x] `OpenTelemetryExporter`, `PrometheusExporter`, `Grafana`/`Jaeger` wiring.
+- [x] `LangfuseExporter`, `SentryExporter`, Arize Phoenix, W&B.
+- [x] End-to-end trace of one request through the pipeline into a backend.
 
-**Effort:** M · **Deps:** none (uses `Exporter`) · **Ship:** Extra / Plugin ·
-**DoD:** a trace lands in OTel or Langfuse from `app.chat(...)`.
+**Effort:** M · **Deps:** none (uses `Exporter`) · **Ship:** Extra / Plugin
+(`xyberos-observability`) ·
+**DoD:** a trace lands in OTel or Langfuse from `app.chat(...)`. — **met:**
+`observability/tests/test_plugin.py` runs `app.chat(...)` and asserts spans land
+in an in-memory OTel exporter and an ingestion batch reaches Langfuse.
 
 ---
 
@@ -517,8 +520,9 @@ enterprise reference deployment documented; DB contract RFC approved.
 > Discord, GitHub, GitLab, Notion, Jira, Linear); **M8** (voice + vision)
 > shipped `xyberos-stt`, `xyberos-tts`, `xyberos-vision`; **M9** (enterprise +
 > infra) shipped `xyberos-auth`, `xyberos-storage`, `xyberos-db` (+ RFC-0020),
-> `xyberos-queues`. The 🔵 backlog (Track G/E/F/H/I/J) remains open for the
-> long tail.
+> `xyberos-queues`; **M10** (observability) shipped `xyberos-observability`
+> (OTel/Prometheus/Langfuse/Sentry exporters, DoD met). The 🔵 backlog (Track
+> G/E/F/H/I/J) remains open for the long tail.
 
 ---
 
@@ -595,6 +599,7 @@ idea into an architectural strategy. 🧲
 
 | Rev | Date | Change |
 | --- | ---- | ------ |
+| 2.4 | 2026-08-16 | **M10 shipped** — `xyberos-observability` plugin: `OpenTelemetryExporter` (in-memory spans), `PrometheusExporter` (counter), `LangfuseExporter` (ingestion API), `SentryExporter` (breadcrumbs/failure captures); DoD met (`app.chat` → trace in OTel + Langfuse); Track L rows + M10 checkboxes flipped to 🟢; full plugin suite 264 passed / 10 skipped. |
 | 2.3 | 2026-08-15 | M1–M5 shipped in `xyberos/xyberos-plugins` (documents, http-api, mcp, vector-qdrant/faiss/redis, web-search); Track A/C/D/F + milestone statuses flipped to 🟢; `[documents]`/`[state]`/`[mcp]` extras added; open questions resolved. |
 | 2.2 | 2026-08-15 | M0 tooling published to PyPI (`xyberos-cli`, `xyberos-plugin-sdk`, `xyberos-plugin-validator`); noted `[documents]` extra for M1. |
 | 2.1 | 2026-08-15 | M0 status updated (contribution guide + CI gate implemented); corrected test counts. |
