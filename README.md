@@ -13,6 +13,8 @@ Each folder is an independently installable plugin that plugs into the public
 | **M4** — RAG completeness | [`vector-qdrant/`](vector-qdrant/) · [`vector-faiss/`](vector-faiss/) · [`vector-redis/`](vector-redis/) | `VectorStore`/`Memory`/cache adapters + parity tests vs `SqliteVectorStore` | 🟢 |
 | **M3** — MCP client | [`mcp/`](mcp/) | stdio + streamable HTTP `McpClient` → one `Tool` per server tool | 🟢 |
 | **M5** — Web search abstraction | [`web-search/`](web-search/) | one `WebSearch` contract, Tavily/Serper/Brave/Exa/Firecrawl behind it | 🟢 |
+| **M6** — Remaining LLM providers | [`llm-providers/`](llm-providers/) | OpenAI-compatible presets (Mistral/Groq/DeepSeek/Cohere/Together/xAI) + Azure/Bedrock/Vertex | 🟢 |
+| **M7** — Community wave | [`github/`](github/) · [`gitlab/`](gitlab/) · [`slack/`](slack/) · [`discord/`](discord/) · [`notion/`](notion/) · [`jira/`](jira/) · [`linear/`](linear/) | comm / PM tools via REST+GraphQL plugins | 🟢 |
 
 > **Why `vector-*` folder names?** The `faiss` and `redis` third-party packages
 > are real top-level modules. A plugin folder named exactly `faiss/` or
@@ -41,6 +43,9 @@ pip install -e ./http-api
 pip install -e ./documents
 pip install -e ./vector-qdrant -e ./vector-faiss -e ./vector-redis
 pip install -e ./mcp -e ./web-search
+pip install -e ./llm-providers
+# community wave (M7) — install any subset
+pip install -e ./github -e ./gitlab -e ./slack -e ./discord -e ./notion -e ./jira -e ./linear
 
 # run a plugin's tests from its folder
 cd http-api && python -m pytest tests -q
@@ -60,3 +65,5 @@ python -c "from xyberos import create_app; app = create_app(); print(app.load_en
 - **M3** is a **Plugin** + optional **`[mcp]`** extra; the client itself is
   stdlib-only (JSON-RPC over stdio / streamable HTTP).
 - **M5** is a **Plugin** (thin `urllib` adapters).
+- **M6** is a **Plugin** / `[llm-providers]` extra — presets reuse the core
+  `OpenAICompatibleLLM` (no new architecture per provider).

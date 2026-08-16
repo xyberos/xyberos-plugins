@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "xyberos-jira"
+version = "0.1.0"
+description = "Jira REST API plugin (RFC-0019, M7): search and create issues"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "Apache-2.0"}
+dependencies = ["xyberos>=1.0"]
+keywords = ["xyberos", "plugin", "jira", "tool"]
+
+[project.entry-points."xyberos.plugins"]
+jira = "xyberos_jira.plugin:plugin"
+
+[tool.setuptools]
+packages = ["xyberos_jira"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "xyberos-llm-providers"
+version = "0.1.0"
+description = "Remaining LLM providers plugin (RFC-0019, M6): OpenAI-compatible presets + Bedrock + Vertex, no new architecture"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "Apache-2.0"}
+dependencies = ["xyberos>=1.0"]
+keywords = ["xyberos", "plugin", "llm", "mistral", "groq", "deepseek", "cohere", "together", "xai", "azure", "bedrock", "vertex"]
+
+[project.optional-dependencies]
+llm_providers = ["boto3", "google-auth"]
+test = ["pytest"]
+
+[project.entry-points."xyberos.plugins"]
+llm_providers = "xyberos_llm_providers.plugin:plugin"
+
+[tool.setuptools]
+packages = ["xyberos_llm_providers"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

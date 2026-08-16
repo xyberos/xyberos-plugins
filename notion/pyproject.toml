@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "xyberos-notion"
+version = "0.1.0"
+description = "Notion API plugin (RFC-0019, M7): search + create pages"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "Apache-2.0"}
+dependencies = ["xyberos>=1.0"]
+keywords = ["xyberos", "plugin", "notion", "tool"]
+
+[project.entry-points."xyberos.plugins"]
+notion = "xyberos_notion.plugin:plugin"
+
+[tool.setuptools]
+packages = ["xyberos_notion"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

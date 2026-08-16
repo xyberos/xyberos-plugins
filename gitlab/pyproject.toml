@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "xyberos-gitlab"
+version = "0.1.0"
+description = "GitLab REST plugin (RFC-0019, M7): project tools for Xyberos agents"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "Apache-2.0"}
+dependencies = ["xyberos>=1.0"]
+keywords = ["xyberos", "plugin", "gitlab", "tool"]
+
+[project.entry-points."xyberos.plugins"]
+gitlab = "xyberos_gitlab.plugin:plugin"
+
+[tool.setuptools]
+packages = ["xyberos_gitlab"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

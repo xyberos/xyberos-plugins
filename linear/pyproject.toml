@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "xyberos-linear"
+version = "0.1.0"
+description = "Linear GraphQL plugin (RFC-0019, M7): search and create issues"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "Apache-2.0"}
+dependencies = ["xyberos>=1.0"]
+keywords = ["xyberos", "plugin", "linear", "tool"]
+
+[project.entry-points."xyberos.plugins"]
+linear = "xyberos_linear.plugin:plugin"
+
+[tool.setuptools]
+packages = ["xyberos_linear"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
