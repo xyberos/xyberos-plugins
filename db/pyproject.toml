@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "xyberos-db"
+version = "0.1.0"
+description = "Database plugin (RFC-0019/0020, M9): connect -> inspect schema -> query -> structured result"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "Apache-2.0"}
+dependencies = ["xyberos>=1.0"]
+keywords = ["xyberos", "plugin", "database", "sqlite", "postgres", "mysql", "duckdb"]
+
+[project.optional-dependencies]
+postgres = ["psycopg[binary]"]
+mysql = ["pymysql"]
+duckdb = ["duckdb"]
+test = ["pytest"]
+
+[project.entry-points."xyberos.plugins"]
+db = "xyberos_db.plugin:plugin"
+
+[tool.setuptools]
+packages = ["xyberos_db"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

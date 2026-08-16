@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "xyberos-vision"
+version = "0.1.0"
+description = "Vision plugin (RFC-0019, M8): describe images, OCR, generate images"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "Apache-2.0"}
+dependencies = ["xyberos>=1.0"]
+keywords = ["xyberos", "plugin", "vision", "ocr", "tesseract", "image"]
+
+[project.optional-dependencies]
+ocr = ["pytesseract", "pillow"]
+test = ["pytest"]
+
+[project.entry-points."xyberos.plugins"]
+vision = "xyberos_vision.plugin:plugin"
+
+[tool.setuptools]
+packages = ["xyberos_vision"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

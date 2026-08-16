@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "xyberos-tts"
+version = "0.1.0"
+description = "Text-to-speech plugin (RFC-0019, M8): ElevenLabs/OpenAI/Polly/Piper"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "Apache-2.0"}
+dependencies = ["xyberos>=1.0"]
+keywords = ["xyberos", "plugin", "tts", "speech", "elevenlabs", "openai", "polly", "piper"]
+
+[project.optional-dependencies]
+aws = ["boto3"]
+local = ["piper-tts"]
+test = ["pytest"]
+
+[project.entry-points."xyberos.plugins"]
+tts = "xyberos_tts.plugin:plugin"
+
+[tool.setuptools]
+packages = ["xyberos_tts"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

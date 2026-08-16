@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "xyberos-auth"
+version = "0.1.0"
+description = "Auth plugin (RFC-0019, M9): OAuth2, OIDC, JWT with Auth0/Okta/Entra presets"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "Apache-2.0"}
+dependencies = ["xyberos>=1.0"]
+keywords = ["xyberos", "plugin", "auth", "oauth2", "oidc", "jwt", "sso"]
+
+[project.optional-dependencies]
+rsa = ["cryptography"]
+test = ["pytest"]
+
+[project.entry-points."xyberos.plugins"]
+auth = "xyberos_auth.plugin:plugin"
+
+[tool.setuptools]
+packages = ["xyberos_auth"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

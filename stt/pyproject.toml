@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "xyberos-stt"
+version = "0.1.0"
+description = "Speech-to-text plugin (RFC-0019, M8): local Whisper + Deepgram/AssemblyAI"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "Apache-2.0"}
+dependencies = ["xyberos>=1.0"]
+keywords = ["xyberos", "plugin", "stt", "speech", "whisper", "deepgram", "assemblyai"]
+
+[project.optional-dependencies]
+local = ["openai-whisper"]
+test = ["pytest"]
+
+[project.entry-points."xyberos.plugins"]
+stt = "xyberos_stt.plugin:plugin"
+
+[tool.setuptools]
+packages = ["xyberos_stt"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

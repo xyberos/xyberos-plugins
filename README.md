@@ -15,6 +15,8 @@ Each folder is an independently installable plugin that plugs into the public
 | **M5** — Web search abstraction | [`web-search/`](web-search/) | one `WebSearch` contract, Tavily/Serper/Brave/Exa/Firecrawl behind it | 🟢 |
 | **M6** — Remaining LLM providers | [`llm-providers/`](llm-providers/) | OpenAI-compatible presets (Mistral/Groq/DeepSeek/Cohere/Together/xAI) + Azure/Bedrock/Vertex | 🟢 |
 | **M7** — Community wave | [`github/`](github/) · [`gitlab/`](gitlab/) · [`slack/`](slack/) · [`discord/`](discord/) · [`notion/`](notion/) · [`jira/`](jira/) · [`linear/`](linear/) | comm / PM tools via REST+GraphQL plugins | 🟢 |
+| **M8** — Voice + vision / multimodal | [`stt/`](stt/) · [`tts/`](tts/) · [`vision/`](vision/) | STT (Whisper/Deepgram/AssemblyAI), TTS (ElevenLabs/OpenAI/Polly/Piper), vision/OCR/image-gen | 🟢 |
+| **M9** — Enterprise + infrastructure | [`auth/`](auth/) · [`storage/`](storage/) · [`db/`](db/) · [`queues/`](queues/) | OAuth2/OIDC/JWT · object storage (S3/Azure/GCS/OneDrive) · DB contract (RFC-0020) · message queues | 🟢 |
 
 > **Why `vector-*` folder names?** The `faiss` and `redis` third-party packages
 > are real top-level modules. A plugin folder named exactly `faiss/` or
@@ -46,6 +48,10 @@ pip install -e ./mcp -e ./web-search
 pip install -e ./llm-providers
 # community wave (M7) — install any subset
 pip install -e ./github -e ./gitlab -e ./slack -e ./discord -e ./notion -e ./jira -e ./linear
+# voice + vision (M8)
+pip install -e ./stt -e ./tts -e ./vision
+# enterprise + infra (M9)
+pip install -e ./auth -e ./storage -e ./db -e ./queues
 
 # run a plugin's tests from its folder
 cd http-api && python -m pytest tests -q

@@ -188,17 +188,19 @@ SQLite (core) and PostgreSQL via pgvector (`[vectors]`) are **shipped**.
 | Integration | Status | Contract | Ship | Notes |
 | ----------- | ------ | -------- | ---- | ----- |
 | Redis — cache + state + vector | � | `Memory` / `VectorStore` / `Service` | Plugin (`xyberos-redis`) + `[state]` | `RedisVectorStore`/`RedisMemory`/`RedisStringCache`; backs `CacheResponder` (M4) |
-| MySQL / MariaDB / MongoDB / DuckDB | 🔵 | `Knowledge` / `Memory` | Plugin | |
+| MySQL / MariaDB / DuckDB | 🟢 | `Database` | Plugin (`xyberos-db`) | RFC-0020 contract; lazy drivers (M9) |
+| MongoDB | 🔵 | `Knowledge` / `Memory` | Plugin | |
 | MSSQL / Oracle | 🔵 | `Knowledge` | Plugin | Enterprise |
 | Snowflake / Databricks | 🔵 | `Knowledge` | Plugin | Analytics |
-| **Database Plugin Contract** | 🟡 | new contract | Core (RFC) | `connect → inspect schema → query → transform → structured result`, DB-agnostic |
+| **Database Plugin Contract** | 🟢 | new contract | Core (RFC-0020) + Plugin (`xyberos-db`) | `connect → inspect schema → query → structured result`, DB-agnostic (M9) |
 
 ### Track E — Document & knowledge sources
 
 | Integration | Status | Contract | Ship | Notes |
 | ----------- | ------ | -------- | ---- | ----- |
-| Cloud storage: S3, GCS, Azure Blob | 🔵 | `Knowledge` / `Tool` | Plugin | |
-| Cloud drive: Google Drive, OneDrive, Dropbox | 🔵 | `Knowledge` / `Tool` | Plugin | |
+| Cloud storage: S3, GCS, Azure Blob | � | `Tool` | Plugin (`xyberos-storage`) | `ObjectStore` contract (M9) |
+| Cloud drive: OneDrive | 🟢 | `Tool` | Plugin (`xyberos-storage`) | Graph REST (M9) |
+| Cloud drive: Google Drive, Dropbox | 🔵 | `Knowledge` / `Tool` | Plugin | |
 | Knowledge platforms: Notion | 🟢 | `Tool` | Plugin (`xyberos-notion`) | `notion_search` / `notion_create_page` (M7) |
 | Knowledge platforms: Confluence, SharePoint | 🔵 | `Knowledge` / `Tool` | Plugin | |
 
@@ -225,26 +227,30 @@ SQLite (core) and PostgreSQL via pgvector (`[vectors]`) are **shipped**.
 
 | Integration | Status | Contract | Ship | Notes |
 | ----------- | ------ | -------- | ---- | ----- |
-| STT: Whisper, Deepgram, AssemblyAI, Google/Azure Speech | 🔵 | `Tool` / `Service` | Plugin | |
-| TTS: ElevenLabs, OpenAI TTS, Google/Azure, Polly, Piper, Coqui | 🔵 | `Tool` / `Service` | Plugin | Piper/Coqui = local |
+| STT: Whisper (local), Deepgram, AssemblyAI | 🟢 | `Tool` | Plugin (`xyberos-stt`) | `stt_transcribe`; local + cloud (M8) |
+| STT: Google / Azure Speech | 🔵 | `Tool` / `Service` | Plugin | |
+| TTS: ElevenLabs, OpenAI TTS, Polly, Piper (local) | 🟢 | `Tool` | Plugin (`xyberos-tts`) | `tts_synthesize`; cloud + local (M8) |
+| TTS: Google / Azure, Coqui | 🔵 | `Tool` / `Service` | Plugin | |
 | Transport: WebRTC, WebSocket, streaming audio | ⚪ | `Service` | Plugin | |
 
 ### Track I — Vision / multimodal
 
 | Integration | Status | Contract | Ship | Notes |
 | ----------- | ------ | -------- | ---- | ----- |
-| Vision: OpenAI / Gemini / Claude vision | 🔵 | `LLMProvider` / `Tool` | Plugin | |
-| OCR: Tesseract, document vision | 🔵 | `Tool` / `Knowledge` | Plugin | |
-| Image generation / understanding | 🔵 | `Tool` | Plugin | |
+| Vision: OpenAI / Gemini / Claude vision | � | `Tool` | Plugin (`xyberos-vision`) | `vision_describe` via OpenAI-compatible vision (M8) |
+| OCR: Tesseract | 🟢 | `Tool` | Plugin (`xyberos-vision`) | `ocr_extract_text` (M8) |
+| Image generation / understanding | 🟢 | `Tool` | Plugin (`xyberos-vision`) | `image_generate` via OpenAI images API (M8) |
 | Multimodal knowledge documents | ⚪ | `Knowledge` | Core | Depends on knowledge system support |
 
 ### Track J — Enterprise
 
 | Integration | Status | Contract | Ship | Notes |
 | ----------- | ------ | -------- | ---- | ----- |
-| Auth: OAuth 2.0, OIDC, JWT, SSO, API keys | 🔵 | `Security` / `Plugin` | Plugin | |
-| Identity: Auth0, Okta, Microsoft Entra, Google | 🔵 | `Plugin` | Plugin | |
-| Storage: SharePoint, OneDrive, S3, Azure Blob, GCS | 🔵 | `Knowledge` / `Tool` | Plugin | |
+| Auth: OAuth 2.0, OIDC, JWT, SSO, API keys | � | `Plugin` | Plugin (`xyberos-auth`) | `OAuth2Client`/`OidcClient`/`JwtCodec` (M9) |
+| Identity: Auth0, Okta, Microsoft Entra | 🟢 | `Plugin` | Plugin (`xyberos-auth`) | OIDC presets (M9) |
+| Identity: Google | 🔵 | `Plugin` | Plugin | |
+| Storage: OneDrive, S3, Azure Blob, GCS | 🟢 | `Tool` | Plugin (`xyberos-storage`) | `ObjectStore` (M9) |
+| Storage: SharePoint | 🔵 | `Knowledge` / `Tool` | Plugin | |
 | DBs: MSSQL, Oracle, SAP, Snowflake, Databricks | 🔵 | `Knowledge` | Plugin | |
 
 ### Track K — Infrastructure
@@ -252,7 +258,8 @@ SQLite (core) and PostgreSQL via pgvector (`[vectors]`) are **shipped**.
 | Integration | Status | Contract | Ship | Notes |
 | ----------- | ------ | -------- | ---- | ----- |
 | Docker, Kubernetes | ⚪ | `Plugin` | Plugin | Deployment-time |
-| Queues: Celery, RabbitMQ, Kafka, NATS, Redis Streams, Postgres queues | ⚪ | `Service` / `Plugin` | Plugin | Async workload glue |
+| Queues: RabbitMQ, Kafka, Redis Streams | 🟢 | `Plugin` | Plugin (`xyberos-queues`) | `MessageQueue` contract (M9) |
+| Queues: Celery, NATS, Postgres queues | 🔵 | `Service` / `Plugin` | Plugin | Async workload glue |
 | Serverless: AWS, Azure, GCP | ⚪ | `Plugin` | Plugin | |
 
 ### Track L — Observability
@@ -450,11 +457,11 @@ plugins merged with 🟢 status.
 
 **Goal:** multimodal capability as plugins.
 
-- [ ] STT: Whisper (local), Deepgram, AssemblyAI, Google/Azure Speech.
-- [ ] TTS: ElevenLabs, OpenAI TTS, Piper/Coqui (local), Polly.
-- [ ] Vision: OpenAI/Gemini/Claude vision; OCR (Tesseract); image gen.
+- [x] STT: Whisper (local), Deepgram, AssemblyAI — `xyberos-stt` (Google/Azure 🔵).
+- [x] TTS: ElevenLabs, OpenAI, Polly, Piper (local) — `xyberos-tts` (Google/Azure/Coqui 🔵).
+- [x] Vision: OpenAI-compatible vision; OCR (Tesseract); image gen — `xyberos-vision`.
 - [ ] Voice transport (WebRTC/WebSocket streaming) ⚪ — deferred.
-- [ ] Example: `examples/voice_assistant.py`.
+- [x] Example: `examples/voice_assistant.py` (STT → LLM → TTS, offline `--stub` mode).
 
 **Effort:** L · **Deps:** M5 · **Ship:** Plugins · **DoD:** one local + one
 cloud STT/TTS pair works; vision example runs.
@@ -465,13 +472,15 @@ cloud STT/TTS pair works; vision example runs.
 
 **Goal:** serious-deployment readiness.
 
-- [ ] Auth/identity plugins: OAuth 2.0, OIDC, JWT, SSO; Auth0/Okta/Entra.
-- [ ] Enterprise storage/DB plugins: SharePoint, OneDrive, S3, Azure Blob, GCS;
-      MSSQL, Oracle, SAP, Snowflake, Databricks.
-- [ ] **Database Plugin Contract** RFC (connect → inspect schema → query →
-      transform → structured result) as a Core additive RFC.
-- [ ] Infra: Docker/Kubernetes, queues (Kafka/NATS/RabbitMQ/Redis Streams),
-      serverless platforms.
+- [x] Auth/identity plugins: OAuth 2.0, OIDC, JWT, SSO; Auth0/Okta/Entra
+      (`xyberos-auth`).
+- [x] Enterprise storage/DB plugins: S3, Azure Blob, GCS, OneDrive
+      (`xyberos-storage`); SQLite/Postgres/MySQL/DuckDB (`xyberos-db`).
+      SharePoint/MSSQL/Oracle/SAP/Snowflake/Databricks remain 🔵.
+- [x] **Database Plugin Contract** RFC (connect → inspect schema → query →
+      transform → structured result) — RFC-0020 + `xyberos-db` reference.
+- [x] Infra: queues (Redis Streams/RabbitMQ/Kafka) via `xyberos-queues`;
+      Docker/Kubernetes + serverless remain ⚪ (deployment-time).
 
 **Effort:** L · **Deps:** M4, M7 · **Ship:** Plugins + one Core RFC · **DoD:**
 enterprise reference deployment documented; DB contract RFC approved.
@@ -504,9 +513,12 @@ enterprise reference deployment documented; DB contract RFC approved.
 | 7 | Observability exporters (threaded through every phase, front-loaded) | L |
 
 > **Status (2026-08-16):** Phases 1–3 are **complete** — M1–M6 shipped in
-> `xyberos/xyberos-plugins`; M7 (community wave) has shipped its first 7
-> plugins (Slack, Discord, GitHub, GitLab, Notion, Jira, Linear). The 🔵
-> backlog (Track G/E/F) remains open for the long tail.
+> `xyberos/xyberos-plugins`; M7 (community wave) shipped 7 plugins (Slack,
+> Discord, GitHub, GitLab, Notion, Jira, Linear); **M8** (voice + vision)
+> shipped `xyberos-stt`, `xyberos-tts`, `xyberos-vision`; **M9** (enterprise +
+> infra) shipped `xyberos-auth`, `xyberos-storage`, `xyberos-db` (+ RFC-0020),
+> `xyberos-queues`. The 🔵 backlog (Track G/E/F/H/I/J) remains open for the
+> long tail.
 
 ---
 
