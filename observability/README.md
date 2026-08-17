@@ -7,15 +7,24 @@ into traces and metrics for **OpenTelemetry**, **Prometheus**, **Langfuse**, and
 ## Install
 
 ```bash
-pip install -e ./observability
+pip install xyberos-observability     # from PyPI
 ```
 
-Optional extras:
+Optional extras (from PyPI):
 
 ```bash
-pip install -e "./observability[otel]"      # opentelemetry-sdk (in-memory spans by default)
-pip install -e "./observability[prometheus]"# prometheus-client
-pip install -e "./observability[sentry]"    # sentry-sdk
+pip install "xyberos-observability[otel]"        # opentelemetry-sdk (in-memory spans by default)
+pip install "xyberos-observability[prometheus]"  # prometheus-client
+pip install "xyberos-observability[sentry]"      # sentry-sdk
+```
+
+Development (editable, from this repo):
+
+```bash
+pip install -e ./observability
+pip install -e "./observability[otel]"
+pip install -e "./observability[prometheus]"
+pip install -e "./observability[sentry]"
 ```
 
 ## How it works

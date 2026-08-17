@@ -7,10 +7,13 @@ lazy Postgres / MySQL / DuckDB drivers.
 ## Install
 
 ```bash
-pip install -e ./db
+pip install xyberos-db              # from PyPI
 pip install xyberos-db[postgres]   # optional drivers
 pip install xyberos-db[mysql]
 pip install xyberos-db[duckdb]
+
+# development (editable, from this repo):
+pip install -e ./db
 ```
 
 ## Usage

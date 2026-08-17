@@ -8,6 +8,9 @@ stdlib-only `urllib` call; the plugin exposes a single typed `web_search` tool.
 ## Install
 
 ```bash
+pip install xyberos-web-search         # from PyPI
+
+# development (editable, from this repo):
 pip install -e ./web-search
 ```
 

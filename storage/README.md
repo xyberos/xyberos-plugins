@@ -6,10 +6,13 @@ behind one `ObjectStore` contract (`list` / `upload` / `download`).
 ## Install
 
 ```bash
-pip install -e ./storage
+pip install xyberos-storage            # from PyPI
 pip install xyberos-storage[s3]        # optional: boto3
 pip install xyberos-storage[azure]     # optional: azure-storage-blob
 pip install xyberos-storage[gcs]       # optional: google-cloud-storage
+
+# development (editable, from this repo):
+pip install -e ./storage
 ```
 
 ## Usage

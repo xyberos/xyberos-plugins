@@ -14,6 +14,9 @@ client (M3) and web search (M5), and it unblocks the whole multiplier chain.
 ## Install
 
 ```bash
+pip install xyberos-http-api          # from PyPI
+
+# development (editable, from this repo):
 pip install -e ./http-api
 ```
 

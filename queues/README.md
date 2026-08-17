@@ -6,10 +6,13 @@ behind one `MessageQueue` contract (`publish` / `poll`).
 ## Install
 
 ```bash
-pip install -e ./queues
+pip install xyberos-queues             # from PyPI
 pip install xyberos-queues[redis]      # optional drivers
 pip install xyberos-queues[rabbitmq]
 pip install xyberos-queues[kafka]
+
+# development (editable, from this repo):
+pip install -e ./queues
 ```
 
 ## Usage

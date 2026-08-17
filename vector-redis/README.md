@@ -7,6 +7,10 @@ backing for `CacheResponder`, all lazy-importing `redis`. Covers the
 ## Install
 
 ```bash
+pip install xyberos-redis               # from PyPI
+pip install "xyberos-redis[state]"      # pulls in redis
+
+# development (editable, from this repo):
 pip install -e ./redis
 pip install redis               # or: pip install xyberos[state]
 ```

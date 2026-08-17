@@ -7,6 +7,9 @@ injectable transport for tests.
 ## Install
 
 ```bash
+pip install xyberos-slack              # from PyPI
+
+# development (editable, from this repo):
 pip install -e ./slack
 ```
 

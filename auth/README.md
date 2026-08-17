@@ -7,6 +7,9 @@ uses lazy `cryptography`.
 ## Install
 
 ```bash
+pip install xyberos-auth            # from PyPI
+
+# development (editable, from this repo):
 pip install -e ./auth
 ```
 

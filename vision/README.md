@@ -6,8 +6,11 @@
 ## Install
 
 ```bash
+pip install xyberos-vision             # from PyPI
+pip install "xyberos-vision[ocr]"      # optional: pytesseract + pillow for OCR
+
+# development (editable, from this repo):
 pip install -e ./vision
-pip install xyberos-vision[ocr]    # optional: pytesseract + pillow for OCR
 ```
 
 ## Usage

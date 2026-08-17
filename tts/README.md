@@ -6,6 +6,9 @@ OpenAI, AWS Polly, or local Piper through one `TextToSpeech` contract.
 ## Install
 
 ```bash
+pip install xyberos-tts                # from PyPI
+
+# development (editable, from this repo):
 pip install -e ./tts
 ```
 

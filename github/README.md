@@ -7,6 +7,9 @@ issue tools for Xyberos agents, via the GitHub REST API v3. Stdlib-only
 ## Install
 
 ```bash
+pip install xyberos-github            # from PyPI
+
+# development (editable, from this repo):
 pip install -e ./github
 ```
 

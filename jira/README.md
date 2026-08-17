@@ -7,6 +7,9 @@ tests.
 ## Install
 
 ```bash
+pip install xyberos-jira              # from PyPI
+
+# development (editable, from this repo):
 pip install -e ./jira
 ```
 

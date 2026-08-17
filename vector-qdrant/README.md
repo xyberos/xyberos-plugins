@@ -7,6 +7,10 @@ as an `xyberos` `VectorStore`. Passes the same parity scenarios as the stdlib
 ## Install
 
 ```bash
+pip install xyberos-qdrant             # from PyPI
+pip install "xyberos-qdrant[vectors]"  # pulls in qdrant-client
+
+# development (editable, from this repo):
 pip install -e ./qdrant
 pip install qdrant-client        # or: pip install xyberos[vectors]
 ```

@@ -10,6 +10,10 @@ standard library. Each configured server's `tools/list` becomes one typed
 ## Install
 
 ```bash
+pip install xyberos-mcp               # from PyPI
+pip install "xyberos-mcp[mcp]"        # optional: official MCP SDK
+
+# development (editable, from this repo):
 pip install -e ./mcp
 ```
 

@@ -7,6 +7,9 @@ transport for tests.
 ## Install
 
 ```bash
+pip install xyberos-notion            # from PyPI
+
+# development (editable, from this repo):
 pip install -e ./notion
 ```
 

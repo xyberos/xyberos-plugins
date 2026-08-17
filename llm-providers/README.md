@@ -8,8 +8,13 @@ Google Vertex AI get dedicated `LLMProvider` adapters.
 ## Install
 
 ```bash
+pip install xyberos-llm-providers     # from PyPI
+pip install "xyberos-llm-providers[llm_providers]"  # optional: boto3 + google-auth for Bedrock/Vertex
+
+# development (editable, from this repo):
 pip install -e ./llm-providers
-pip install xyberos[llm-providers]   # optional: boto3 + google-auth for Bedrock/Vertex
+# (also available as the core extra):
+pip install xyberos[llm-providers]
 ```
 
 ## Provider presets (OpenAI-compatible — one line each)

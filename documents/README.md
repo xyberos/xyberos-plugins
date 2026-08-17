@@ -21,9 +21,13 @@ import their backend lazily and raise a clear `ProviderError` when missing.
 ## Install
 
 ```bash
+pip install xyberos-documents        # from PyPI
+pip install "xyberos-documents[documents]"  # PDF/DOCX/XLSX backends: pypdf, python-docx, openpyxl
+
+# development (editable, from this repo):
 pip install -e ./documents
 # PDF/DOCX/XLSX backends (also available as the core extra):
-pip install xyberos[documents]     # pypdf, python-docx, openpyxl
+pip install xyberos[documents]
 ```
 
 ## Usage

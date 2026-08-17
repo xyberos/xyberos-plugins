@@ -8,6 +8,10 @@ Done).
 ## Install
 
 ```bash
+pip install xyberos-faiss              # from PyPI
+pip install "xyberos-faiss[vectors]"   # pulls in faiss-cpu
+
+# development (editable, from this repo):
 pip install -e ./faiss
 pip install faiss-cpu             # or: pip install xyberos[vectors]
 ```

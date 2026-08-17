@@ -7,6 +7,9 @@ with an injectable transport for tests.
 ## Install
 
 ```bash
+pip install xyberos-discord          # from PyPI
+
+# development (editable, from this repo):
 pip install -e ./discord
 ```
 
