@@ -1,0 +1,120 @@
+name: pypi-plugins
+
+# Automatically publish the Xyberos plugin packages to PyPI.
+#
+# How each plugin gets "addressed" (routed to its own PyPI project):
+#   - A job matrix runs one build+upload job per plugin directory.
+#   - PyPI does the actual routing: each wheel/sdist embeds its project name
+#     (e.g. xyberos_github-0.1.0-*.whl -> project "xyberos-github"), so PyPI
+#     sends every upload to the project that matches that name. No per-plugin
+#     target URL is needed in this file.
+#   - Authentication uses Trusted Publishing (OIDC) - no API tokens in the
+#     repo. For EACH "xyberos-*" project on PyPI, register this repo as a
+#     trusted publisher:
+#         Owner:  <your-github-org-or-user>
+#         Repo:   xyberos-plugins
+#         Workflow name: pypi-plugins.yml
+#         Environment:   (leave blank)
+#     Each project can only receive uploads from the matching matrix job.
+#
+# Triggers:
+#   - Manual (workflow_dispatch): publish all, or a comma-separated subset.
+#   - Tag push:
+#       v0.1.0            -> publish ALL plugins
+#       github/v0.1.0     -> publish only the "github" plugin
+
+on:
+  workflow_dispatch:
+    inputs:
+      plugins:
+        description: >-
+          Comma-separated plugin directories to publish
+          (e.g. "github,http-api"). Leave empty to publish ALL plugins.
+        required: false
+        type: string
+        default: ''
+  push:
+    tags:
+      - 'v*'      # e.g. v0.1.0       -> all plugins
+      - '*/v*'    # e.g. github/v0.1.0 -> one plugin
+
+permissions:
+  contents: read
+  id-token: write   # required for PyPI trusted publishing (OIDC)
+
+concurrency:
+  group: pypi-plugins-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Publish ${{ matrix.plugin }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false   # one plugin failing must not block the others
+      matrix:
+        plugin:
+          - auth
+          - db
+          - discord
+          - documents
+          - github
+          - gitlab
+          - http-api
+          - jira
+          - linear
+          - llm-providers
+          - mcp
+          - notion
+          - observability
+          - queues
+          - slack
+          - storage
+          - stt
+          - tts
+          - vector-faiss
+          - vector-qdrant
+          - vector-redis
+          - vision
+          - web-search
+
+    # Decide per-matrix-row whether this plugin should publish:
+    #  - manual run: publish if the input is empty ("all") or names this plugin
+    #  - tag push:   publish if the tag is a bare "vX.Y.Z" (all) or is
+    #                prefixed with this plugin's directory ("<plugin>/vX.Y.Z")
+    if: >-
+      (github.event_name == 'workflow_dispatch' &&
+       (github.event.inputs.plugins == '' ||
+        contains(github.event.inputs.plugins, matrix.plugin))) ||
+      (github.event_name == 'push' &&
+       (startsWith(github.ref, 'refs/tags/v') ||
+        startsWith(github.ref, format('refs/tags/{0}/', matrix.plugin))))
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Build sdist and wheel
+        working-directory: ${{ matrix.plugin }}
+        run: |
+          python -m pip install --upgrade pip build
+          python -m build
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: ${{ matrix.plugin }}/dist
+          # Skip versions that are already on PyPI instead of failing the
+          # whole matrix. Remove this to make "already exists" an error.
+          skip-existing: true
+          # Dry-run against Test PyPI (no real upload) while testing:
+          # repository-url: https://test.pypi.org/legacy/
+          #
+          # Alternative auth (if you don't use Trusted Publishing):
+          #   username: __token__
+          #   password: ${{ secrets.PYPI_API_TOKEN }}
