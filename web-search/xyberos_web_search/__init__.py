@@ -2,9 +2,10 @@
 
 One :class:`~xyberos_web_search.contract.WebSearch` contract,
 :meth:`~xyberos_web_search.contract.WebSearch.search(query, top_k) -> list[Result]`,
-with thin adapters for Tavily, Serper, Brave, Exa and Firecrawl behind it. Each
-adapter is stdlib-only (``urllib``), injectable for tests, and reads its API key
-from an environment variable.
+with thin adapters for Tavily, Serper, Brave, Exa and Firecrawl behind it, plus
+a free, keyless DuckDuckGo provider (the default). Each adapter is stdlib-only
+(``urllib``), injectable for tests; paid providers read their API key from an
+environment variable.
 """
 
 from .contract import SearchResult, WebSearch

@@ -6,22 +6,23 @@ from typing import Any
 
 from .adapters import (
     BraveSearch,
+    DuckDuckGoSearch,
     ExaSearch,
     FirecrawlSearch,
     SerperSearch,
     TavilySearch,
-    _BaseSearch,
 )
 from .contract import WebSearch
 from .http import RequestTransport
 
 #: provider key -> adapter class
-PROVIDERS: dict[str, type[_BaseSearch]] = {
+PROVIDERS: dict[str, type[WebSearch]] = {
     "tavily": TavilySearch,
     "serper": SerperSearch,
     "brave": BraveSearch,
     "exa": ExaSearch,
     "firecrawl": FirecrawlSearch,
+    "duckduckgo": DuckDuckGoSearch,
 }
 
 

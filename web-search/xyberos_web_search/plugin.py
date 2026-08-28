@@ -2,9 +2,10 @@
 
 Registers a single ``web_search(query, top_k=5)`` typed tool backed by the
 configured provider. Provider and API key come from explicit args, then
-``WEB_SEARCH_PROVIDER`` / provider-specific ``*_API_KEY`` env vars (default
-provider: ``tavily``). Calling the tool without a key raises a clear
-``ProviderError``.
+``WEB_SEARCH_PROVIDER`` / provider-specific ``*_API_KEY`` env vars. The default
+provider is ``duckduckgo`` (free, no API key); paid providers (tavily, serper,
+brave, exa, firecrawl) read their key from ``*_API_KEY`` and raise a clear
+``ProviderError`` when it is missing.
 """
 
 from __future__ import annotations
@@ -41,7 +42,7 @@ class WebSearchPlugin(Plugin):
         timeout: float = 30.0,
         request: RequestTransport | None = None,
     ) -> None:
-        self._provider = (provider or os.getenv(f"{env_prefix}_PROVIDER") or "tavily").lower()
+        self._provider = (provider or os.getenv(f"{env_prefix}_PROVIDER") or "duckduckgo").lower()
         self._api_key = api_key
         self._env_prefix = env_prefix
         self._timeout = timeout

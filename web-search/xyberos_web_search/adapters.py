@@ -8,13 +8,20 @@ key read from an environment variable. A missing key raises a clear
 
 from __future__ import annotations
 
+import html
 import os
+import urllib.parse
+from html.parser import HTMLParser
 from typing import Any
 
 from xyberos.exceptions.provider import ProviderError
 
 from .contract import SearchResult, WebSearch
 from .http import RequestTransport, default_request
+
+
+#: Browser-ish user agent for the free DuckDuckGo endpoint (no API key).
+USER_AGENT = "xyberos-web-search/duckduckgo (no api key)"
 
 
 def _raise_for_status(status: int, body: Any) -> None:
@@ -183,3 +190,116 @@ class FirecrawlSearch(_BaseSearch):
             )
             for item in body.get("data", [])
         ][:top_k]
+
+
+class _DdgParser(HTMLParser):
+    """Pull ranked result titles / URLs / snippets from DuckDuckGo lite HTML."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.results: list[SearchResult] = []
+        self._current: dict[str, str] | None = None
+        self._buf: list[str] = []
+        self._in_link = False
+        self._in_snippet = False
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        attrs = dict(attrs)
+        classes = (attrs.get("class") or "").split()
+        if tag == "a" and "result-link" in classes:
+            self._current = {
+                "title": "",
+                "url": self._clean_url(attrs.get("href") or ""),
+            }
+            self._in_link = True
+            self._buf = []
+        elif tag == "td" and "result-snippet" in classes:
+            self._in_snippet = True
+            self._buf = []
+
+    def handle_data(self, data: str) -> None:
+        if self._in_link or self._in_snippet:
+            self._buf.append(data)
+
+    def handle_endtag(self, tag: str) -> None:
+        if tag == "a" and self._in_link and self._current is not None:
+            self._current["title"] = " ".join("".join(self._buf).split())
+            self.results.append(
+                SearchResult(title=self._current["title"], url=self._current["url"])
+            )
+            self._current = None
+            self._in_link = False
+            self._buf = []
+        elif tag == "td" and self._in_snippet:
+            snippet = " ".join("".join(self._buf).split())
+            if self.results and not self.results[-1].snippet:
+                self.results[-1] = SearchResult(
+                    title=self.results[-1].title,
+                    url=self.results[-1].url,
+                    snippet=snippet,
+                    score=self.results[-1].score,
+                    extra=self.results[-1].extra,
+                )
+            self._in_snippet = False
+            self._buf = []
+
+    @staticmethod
+    def _clean_url(href: str) -> str:
+        if not href:
+            return ""
+        if href.startswith("//"):
+            href = "https:" + href
+        if "uddg=" in href:
+            parsed = urllib.parse.urlparse(href)
+            return urllib.parse.parse_qs(parsed.query).get("uddg", [href])[0]
+        return html.unescape(href)
+
+
+class DuckDuckGoSearch(WebSearch):
+    """Free, keyless web search backed by DuckDuckGo's lite endpoint.
+
+    Implements the same :class:`~xyberos_web_search.contract.WebSearch` contract
+    as the paid adapters but requires **no API key** (``api_key`` is accepted
+    for registry parity and never used). A bot-block or server-error response
+    (HTTP 202/403/5xx, or an empty page) surfaces as no results / a clear
+    :class:`~xyberos.exceptions.provider.ProviderError` instead of a crash.
+    """
+
+    name = "duckduckgo"
+    url = "https://lite.duckduckgo.com/lite/"
+
+    def __init__(
+        self,
+        api_key: str | None = None,  # accepted for registry parity, never used
+        *,
+        request: RequestTransport | None = None,
+        timeout: float = 30.0,
+    ) -> None:
+        self._api_key = api_key
+        self._request = request or default_request
+        self._timeout = timeout
+
+    def search(self, query: str, top_k: int = 5) -> list[SearchResult]:
+        """Return up to ``top_k`` ranked results for ``query``, best first."""
+        query = (query or "").strip()
+        if not query:
+            return []
+        limit = max(int(top_k), 1)
+
+        status, body = self._request(
+            "GET",
+            self.url,
+            query={"q": query},
+            headers={"User-Agent": USER_AGENT},
+            timeout=self._timeout,
+        )
+        page = body if isinstance(body, str) else str(body)
+        # DuckDuckGo returns HTTP 202/403 (or an empty page) to clients whose
+        # TLS fingerprint it dislikes - treat that as "no results", not a crash.
+        if status in (202, 403) or not page.strip():
+            return []
+        _raise_for_status(status, page)
+
+        parser = _DdgParser()
+        parser.feed(page)
+        return parser.results[:limit]

@@ -24,6 +24,16 @@ def test_plugin_conforms_to_contract():
     assert callable(plugin.register) and callable(plugin.unregister)
 
 
+def test_plugin_defaults_to_free_duckduckgo():
+    plugin = WebSearchPlugin()
+    assert plugin.provider_name == "duckduckgo"
+
+
+def test_plugin_explicit_provider_wins():
+    plugin = WebSearchPlugin(provider="tavily", api_key="k")
+    assert plugin.provider_name == "tavily"
+
+
 def _fake_request(body):
     return lambda *args, **kwargs: (200, body)
 

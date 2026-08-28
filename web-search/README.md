@@ -1,9 +1,10 @@
 # xyberos-web-search
 
 **Web search abstraction plugin — RFC-0019, M5.** One `WebSearch` contract
-(`search(query, top_k) -> list[Result]`), many providers behind it: **Tavily**,
-**Serper**, **Brave**, **Exa**, **Firecrawl**. Each adapter is a thin,
-stdlib-only `urllib` call; the plugin exposes a single typed `web_search` tool.
+(`search(query, top_k) -> list[Result]`), many providers behind it: **DuckDuckGo**
+(free, no API key — the default), plus **Tavily**, **Serper**, **Brave**, **Exa**,
+**Firecrawl**. Each adapter is a thin, stdlib-only `urllib` call; the plugin
+exposes a single typed `web_search` tool.
 
 ## Install
 
@@ -21,7 +22,7 @@ from xyberos import create_app
 from xyberos_web_search import WebSearchPlugin
 
 app = create_app()
-app.load_plugin(WebSearchPlugin(provider="tavily"))   # API key from TAVILY_API_KEY
+app.load_plugin(WebSearchPlugin())   # default: duckduckgo - free, no API key
 
 app.tools.execute("web_search", None, query="xyberos", top_k=5)
 ```
@@ -30,14 +31,15 @@ Provider + key resolution (explicit args, then env):
 
 | Provider | `provider` | API key env |
 | -------- | ---------- | ----------- |
+| DuckDuckGo (default) | `duckduckgo` | — *(free, keyless)* |
 | Tavily | `tavily` | `TAVILY_API_KEY` |
 | Serper | `serper` | `SERPER_API_KEY` |
 | Brave | `brave` | `BRAVE_API_KEY` |
 | Exa | `exa` | `EXA_API_KEY` |
 | Firecrawl | `firecrawl` | `FIRECRAWL_API_KEY` |
 
-`WEB_SEARCH_PROVIDER` selects the default provider (default `tavily`). Calling
-the tool without a key raises a clear `ProviderError`.
+`WEB_SEARCH_PROVIDER` selects the default provider (default `duckduckgo`). Paid
+providers raise a clear `ProviderError` when their key is missing.
 
 ### Use the contract directly (provider-agnostic)
 

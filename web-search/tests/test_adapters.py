@@ -29,6 +29,14 @@ BODIES: dict[str, tuple[dict, tuple[str, str, str]]] = {
         {"data": [{"title": "Fire Title", "url": "https://f", "description": "Fire snippet"}]},
         ("Fire Title", "https://f", "Fire snippet"),
     ),
+    "duckduckgo": (
+        (
+            '<div class="result"><a rel="nofollow" class="result-link" '
+            'href="//duckduckgo.com/l/?uddg=https%3A%2F%2Fdocs.xyberos.com">'
+            "Xyberos Docs</a><td class=\"result-snippet\">Platform docs</td></div>"
+        ),
+        ("Xyberos Docs", "https://docs.xyberos.com", "Platform docs"),
+    ),
 }
 
 
@@ -60,6 +68,8 @@ def test_adapter_respects_top_k(provider):
 
 def _repeat(body):
     # Cheap way to get more than one result per provider shape.
+    if isinstance(body, str):
+        return body * 3  # duckduckgo: repeat the HTML page
     if "organic" in body:
         return {"organic": body["organic"] * 3}
     if "web" in body:
@@ -71,7 +81,9 @@ def _repeat(body):
 
 @pytest.mark.parametrize("provider", sorted(PROVIDERS))
 def test_missing_api_key_raises(provider, monkeypatch):
-    env_var = PROVIDERS[provider].api_key_env
+    env_var = getattr(PROVIDERS[provider], "api_key_env", None)
+    if env_var is None:  # keyless provider (duckduckgo) - nothing to check
+        pytest.skip(f"{provider} requires no API key")
     monkeypatch.delenv(env_var, raising=False)
     search = get_web_search(provider, api_key=None, request=_fake_request({}))
     with pytest.raises(ProviderError, match="API key"):
