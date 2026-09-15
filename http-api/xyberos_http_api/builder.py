@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import inspect
 import re
-from typing import Any
+from typing import Any, cast
 
 from xyberos.contracts import Tool
 from xyberos.tools import FunctionTool
@@ -72,7 +72,7 @@ def make_typed_callable(name: str, params: list[Param], impl: Any) -> Any:
 
     _call.__name__ = name
     _call.__qualname__ = name
-    _call.__signature__ = signature
+    setattr(_call, "__signature__", signature)
     return _call
 
 
@@ -80,20 +80,20 @@ def extract_path(data: Any, path: str | None) -> Any:
     """Extract a dotted path (with optional ``[index]`` steps) from JSON data."""
     if not path:
         return data
-    current = data
+    current: Any = data
     for part in path.split("."):
         match = _TOKEN_RE.search(part)
         key = _TOKEN_RE.sub("", part) if match else part
         if key and isinstance(current, dict):
-            current = current.get(key)
+            current = cast(dict[str, Any], current).get(key)
         elif key and not isinstance(current, dict):
             return None
         if match and isinstance(current, list):
             try:
-                current = current[int(match.group(1))]
+                current = cast(list[Any], current)[int(match.group(1))]
             except (IndexError, ValueError):
                 return None
-    return current
+    return cast(Any, current)
 
 
 def build_operation_tool(

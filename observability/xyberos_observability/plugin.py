@@ -10,7 +10,7 @@ plugin registers nothing (logs a warning).
 from __future__ import annotations
 
 import os
-from typing import Any
+from typing import Any, cast
 
 from xyberos.contracts import Plugin
 from xyberos.events import EventRecorder, Exporter
@@ -77,13 +77,13 @@ class ObservabilityPlugin(Plugin):
                     "observability plugin not configured: set %s_EXPORTERS", self._env_prefix
                 )
             return
-        events = kernel.resolve("events")
+        events = cast(Any, kernel).resolve("events")
         self._recorder = EventRecorder(exporters=exporters).subscribe_to(events)
-        kernel.register("observability", self._recorder, replace=True)
+        cast(Any, kernel).register("observability", self._recorder, replace=True)
 
     def unregister(self, kernel: object) -> None:
         if self._recorder is not None:
-            self._recorder.unsubscribe_from(kernel.resolve("events"))
+            self._recorder.unsubscribe_from(cast(Any, kernel).resolve("events"))
             self._recorder = None
 
 

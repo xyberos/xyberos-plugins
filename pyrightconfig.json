@@ -1,0 +1,14 @@
+{
+  "typeCheckingMode": "strict",
+  "extraPaths": [
+    "../xyberos"
+  ],
+  "exclude": [
+    "**/node_modules",
+    "**/__pycache__",
+    "**/build",
+    "**/dist",
+    "**/*.egg-info",
+    "**/.venv"
+  ]
+}

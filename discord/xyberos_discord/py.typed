@@ -1,0 +1,5 @@
+# PEP 561 marker: this package ships inline type annotations, so type
+# checkers (Pylance/Pyright, mypy) analyze it as a typed package instead of
+# reporting reportMissingTypeStubs on `from xyberos_discord import ...`.
+# Setuptools ships this file by default; pyproject.toml also declares it under
+# [tool.setuptools.package-data] so the intent survives a change to that default.

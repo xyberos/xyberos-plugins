@@ -13,7 +13,7 @@ import json
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from xyberos.exceptions.provider import ProviderError
 
@@ -101,8 +101,8 @@ class HttpApiSpec:
 
     name: str
     base_url: str
-    operations: list[Operation] = field(default_factory=list)
-    headers: dict[str, str] = field(default_factory=dict)
+    operations: list[Operation] = field(default_factory=list[Operation])
+    headers: dict[str, str] = field(default_factory=dict[str, str])
     auth: AuthSpec = field(default_factory=AuthSpec)
     rate_limit: RateLimitSpec | None = None
     timeout: float = 30.0
@@ -235,7 +235,7 @@ def load_spec(source: Any) -> HttpApiSpec | list[HttpApiSpec]:
     if isinstance(source, (str, Path)):
         return HttpApiSpec.from_file(source)
     if isinstance(source, list):
-        return [HttpApiSpec.from_dict(item) for item in source]
+        return [HttpApiSpec.from_dict(item) for item in cast(list[Mapping[str, Any]], source)]
     if isinstance(source, Mapping):
-        return HttpApiSpec.from_dict(source)
+        return HttpApiSpec.from_dict(cast(Mapping[str, Any], source))
     raise TypeError("spec must be a mapping, a list of mappings, or a path to a JSON/YAML file")

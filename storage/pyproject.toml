@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "xyberos-storage"
-version = "0.1.0"
+version = "0.1.1"
 description = "Object storage plugin (RFC-0019, M9): S3, Azure Blob, GCS, OneDrive behind one ObjectStore contract"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -23,6 +23,12 @@ storage = "xyberos_storage.plugin:plugin"
 
 [tool.setuptools]
 packages = ["xyberos_storage"]
+
+[tool.setuptools.package-data]
+# PEP 561 marker: ships inline type annotations to consumers.
+# Setuptools' default already includes it; declared explicitly so
+# the intent survives a change to that default.
+xyberos_storage = ["py.typed"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

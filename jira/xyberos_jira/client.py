@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import base64
 import os
-from typing import Any
+from typing import Any, cast
 
 from xyberos.exceptions.provider import ProviderError
 
@@ -16,6 +16,16 @@ def _raise_for_status(status: int, body: Any) -> None:
         return
     message = body if isinstance(body, str) else str(body)
     raise ProviderError(f"Jira API returned HTTP {status}: {message[:200]}")
+
+
+def _dig(data: Any, path: str) -> Any:
+    """Best-effort dotted access into a parsed JSON object (returns ``None`` on miss)."""
+    current: Any = data
+    for key in path.split("."):
+        if not isinstance(current, dict):
+            return None
+        current = cast(dict[str, Any], current).get(key)
+    return current
 
 
 class JiraClient:
@@ -47,10 +57,10 @@ class JiraClient:
         _raise_for_status(status, body)
         return [
             {
-                "key": issue.get("key"),
-                "summary": (issue.get("fields") or {}).get("summary"),
-                "status": ((issue.get("fields") or {}).get("status") or {}).get("name"),
-                "url": f"{self._base_url}/browse/{issue.get('key')}",
+                "key": _dig(issue, "key"),
+                "summary": _dig(issue, "fields.summary"),
+                "status": _dig(issue, "fields.status.name"),
+                "url": f"{self._base_url}/browse/{_dig(issue, 'key')}",
             }
             for issue in body.get("issues", [])
         ]

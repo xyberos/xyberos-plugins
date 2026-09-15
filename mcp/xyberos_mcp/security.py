@@ -10,7 +10,7 @@
 
 from __future__ import annotations
 
-from typing import Iterable
+from typing import Any, Iterable, cast
 
 from .errors import McpSecurityError
 
@@ -23,7 +23,7 @@ def validate_command(argv: list[str]) -> list[str]:
     """Validate a stdio server command: a non-empty list of plain strings."""
     if not argv:
         raise McpSecurityError("stdio server command must be a non-empty list of strings")
-    if not all(isinstance(token, str) for token in argv):
+    if not all(isinstance(token, str) for token in cast(list[Any], argv)):
         raise McpSecurityError("stdio server command must contain only strings")
     if not argv[0].strip():
         raise McpSecurityError("stdio server command must name an executable")

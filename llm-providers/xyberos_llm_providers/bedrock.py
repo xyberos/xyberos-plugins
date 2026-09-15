@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import importlib
 import os
-from typing import Any
+from typing import Any, cast
 
 from xyberos.exceptions.provider import ProviderError
 
@@ -49,7 +49,7 @@ class BedrockLLM:
         output = response.get("output", {})
         message = output.get("message", {})
         parts = message.get("content", [])
-        text = "".join(str(part.get("text", "")) for part in parts if isinstance(part, dict))
+        text = "".join(str(cast(dict[str, Any], part).get("text", "")) for part in parts if isinstance(part, dict))
         if not text:
             raise ProviderError(f"Bedrock returned no text for model {self._model_id}")
         return text

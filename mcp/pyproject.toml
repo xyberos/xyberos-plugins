@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "xyberos-mcp"
-version = "0.2.0"
+version = "0.2.1"
 description = "Model Context Protocol plugin (RFC-0019, M3): stdio + streamable HTTP client, one Tool per server tool, and expose() to serve an app's tools as an MCP server"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -21,6 +21,12 @@ mcp = "xyberos_mcp.plugin:plugin"
 
 [tool.setuptools]
 packages = ["xyberos_mcp"]
+
+[tool.setuptools.package-data]
+# PEP 561 marker: ships inline type annotations to consumers.
+# Setuptools' default already includes it; declared explicitly so
+# the intent survives a change to that default.
+xyberos_mcp = ["py.typed"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

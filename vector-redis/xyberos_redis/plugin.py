@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import importlib
 import os
-from typing import Any
+from typing import Any, cast
 
 from xyberos.contracts import Plugin
 from xyberos.exceptions.provider import ProviderError
@@ -60,29 +60,29 @@ class RedisPlugin(Plugin):
 
     def register(self, kernel: object) -> None:
         client = self._shared_client()
-        kernel.register("redis_client", client, replace=True)
-        kernel.register(
+        cast(Any, kernel).register("redis_client", client, replace=True)
+        cast(Any, kernel).register(
             "redis_vector",
             RedisVectorStore(client=client, key_prefix=f"{self._prefix}:vs"),
             replace=True,
         )
-        kernel.register(
+        cast(Any, kernel).register(
             "redis_memory",
             RedisMemory(client=client, key=f"{self._prefix}:memory"),
             replace=True,
         )
-        kernel.register(
+        cast(Any, kernel).register(
             "redis_cache",
             RedisStringCache(client=client, key_prefix=f"{self._prefix}:cache"),
             replace=True,
         )
         if self._replace_defaults:
-            kernel.register(
+            cast(Any, kernel).register(
                 "vector_store",
                 RedisVectorStore(client=client, key_prefix=f"{self._prefix}:vs"),
                 replace=True,
             )
-            kernel.register(
+            cast(Any, kernel).register(
                 "memory",
                 RedisMemory(client=client, key=f"{self._prefix}:memory"),
                 replace=True,

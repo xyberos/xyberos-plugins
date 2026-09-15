@@ -67,7 +67,10 @@ class VertexAILlm:
         self._location = location
         self._token_provider = token_provider or _default_token
         self._timeout = timeout
-        self._post = post or (lambda url, payload, headers: _default_post(url, payload, headers, timeout=timeout))
+        def _post_default(url: str, payload: dict[str, Any], headers: dict[str, Any]) -> Any:
+            return _default_post(url, payload, headers, timeout=timeout)
+
+        self._post = post or _post_default
 
     def generate(self, prompt: str) -> str:
         if not self._project:

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import os
-from typing import Any
+from typing import Any, cast
 
 from xyberos.exceptions.provider import ProviderError
 
@@ -64,5 +64,7 @@ class SlackClient:
 
     @staticmethod
     def _check_ok(body: Any, action: str) -> None:
-        if isinstance(body, dict) and body.get("ok") is False:
-            raise ProviderError(f"Slack '{action}' failed: {body.get('error')}")
+        if isinstance(body, dict):
+            payload = cast(dict[str, Any], body)
+            if payload.get("ok") is False:
+                raise ProviderError(f"Slack '{action}' failed: {payload.get('error')}")

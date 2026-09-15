@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "xyberos-observability"
-version = "0.1.0"
+version = "0.1.1"
 description = "Observability exporters plugin (RFC-0019, M10): OTel, Prometheus, Langfuse, Sentry as thin EventBus exporters"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -23,6 +23,12 @@ observability = "xyberos_observability.plugin:plugin"
 
 [tool.setuptools]
 packages = ["xyberos_observability"]
+
+[tool.setuptools.package-data]
+# PEP 561 marker: ships inline type annotations to consumers.
+# Setuptools' default already includes it; declared explicitly so
+# the intent survives a change to that default.
+xyberos_observability = ["py.typed"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

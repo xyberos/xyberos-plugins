@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 import os
-from typing import Any
+from typing import Any, cast
 
 from xyberos.exceptions.provider import ProviderError
 
@@ -16,6 +16,16 @@ def _raise_for_status(status: int, body: Any) -> None:
         return
     message = body if isinstance(body, str) else str(body)
     raise ProviderError(f"Linear API returned HTTP {status}: {message[:200]}")
+
+
+def _dig(data: Any, path: str) -> Any:
+    """Best-effort dotted access into a parsed JSON object (returns ``None`` on miss)."""
+    current: Any = data
+    for key in path.split("."):
+        if not isinstance(current, dict):
+            return None
+        current = cast(dict[str, Any], current).get(key)
+    return current
 
 
 class LinearClient:
@@ -50,9 +60,11 @@ class LinearClient:
             "}) { success issue { id url } } }"
         )
         data = self._graphql(graphql)
-        created = data.get("issueCreate", {})
-        issue = created.get("issue") or {}
-        return {"id": issue.get("id"), "url": issue.get("url"), "success": created.get("success")}
+        return {
+            "id": _dig(data, "issueCreate.issue.id"),
+            "url": _dig(data, "issueCreate.issue.url"),
+            "success": _dig(data, "issueCreate.success"),
+        }
 
     def _graphql(self, query: str) -> dict[str, Any]:
         if not self._api_key:

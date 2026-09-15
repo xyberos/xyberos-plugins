@@ -11,7 +11,7 @@ no-op for entry-point discovery.
 from __future__ import annotations
 
 import os
-from typing import Any
+from typing import Any, cast
 
 from xyberos.contracts import Plugin
 from xyberos.llm import LLMProvider
@@ -60,7 +60,7 @@ class LlmProvidersPlugin(Plugin):
             if logger is not None and callable(getattr(logger, "warning", None)):
                 logger.warning("llm_providers plugin not configured: %s", exc)
             return
-        kernel.register("llm", llm, replace=True)
+        cast(Any, kernel).register("llm", llm, replace=True)
 
     def unregister(self, kernel: object) -> None:
         pass

@@ -14,7 +14,7 @@ from typing import Any
 
 from xyberos.exceptions.provider import ProviderError
 
-from .http import RawRequestTransport, RequestTransport, default_raw_request, default_request
+from .http import RequestTransport, default_request
 
 
 def _raise_for_status(status: int, body: Any) -> None:

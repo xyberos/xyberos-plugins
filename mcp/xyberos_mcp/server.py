@@ -12,9 +12,10 @@ Install the SDK with ``pip install "xyberos-mcp[mcp]"``.
 
 from __future__ import annotations
 
+import importlib
 import inspect
 import re
-from typing import Any
+from typing import Any, cast
 
 from .errors import McpError
 
@@ -31,14 +32,12 @@ _TYPE_MAP: dict[str, type] = {
 def _load_server_class() -> type:
     """Return the MCP server class (mcp<2 ``FastMCP`` or mcp>=2 ``MCPServer``)."""
     try:
-        from mcp.server.fastmcp import FastMCP  # mcp < 2
-
-        return FastMCP
+        module = importlib.import_module("mcp.server.fastmcp")  # mcp < 2
+        return cast(type, module.FastMCP)
     except Exception:
         try:
-            from mcp.server.mcpserver import MCPServer  # mcp >= 2
-
-            return MCPServer
+            module = importlib.import_module("mcp.server.mcpserver")  # mcp >= 2
+            return cast(type, module.MCPServer)
         except Exception as exc:
             raise McpError(
                 "expose()/build_server() require the official MCP SDK; "
@@ -62,10 +61,10 @@ def _tool_callable(tool: Any) -> Any:
     :func:`xyberos_mcp.schema.build_function_tool` - so the SDK derives a
     correct ``inputSchema`` and validates incoming arguments before execution.
     """
-    schema = getattr(tool, "schema", {}) or {}
-    parameters = schema.get("parameters") or {}
-    properties = parameters.get("properties") or {}
-    required = set(parameters.get("required") or [])
+    schema = cast(dict[str, Any], getattr(tool, "schema", {}) or {})
+    parameters = cast(dict[str, Any], schema.get("parameters") or {})
+    properties = cast(dict[str, Any], parameters.get("properties") or {})
+    required = set(cast(list[str], parameters.get("required") or []))
 
     mapping: dict[str, str] = {}
     signature_params: list[inspect.Parameter] = []
@@ -93,7 +92,7 @@ def _tool_callable(tool: Any) -> Any:
 
     _call.__name__ = tool.name
     _call.__qualname__ = tool.name
-    _call.__signature__ = inspect.Signature(parameters=signature_params)
+    setattr(_call, "__signature__", inspect.Signature(parameters=signature_params))
     return _call
 
 

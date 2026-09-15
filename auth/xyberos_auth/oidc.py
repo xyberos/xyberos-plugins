@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, cast
 
 from .errors import AuthError
 from .http import RequestTransport, default_request
@@ -49,8 +49,9 @@ class OidcClient:
         _raise_for_status(status, body)
         if not isinstance(body, dict):
             raise AuthError("OIDC discovery returned a non-object response")
-        self._metadata = body
-        return body
+        metadata = cast(dict[str, Any], body)
+        self._metadata = metadata
+        return metadata
 
     def userinfo(self, access_token: str) -> dict[str, Any]:
         """Fetch the userinfo endpoint with ``access_token``."""

@@ -11,7 +11,6 @@ is configured.
 
 from __future__ import annotations
 
-import os
 from typing import Any, cast
 
 from xyberos.contracts import Plugin, Tool
@@ -76,12 +75,12 @@ class McpPlugin(Plugin):
             if logger is not None and callable(getattr(logger, "warning", None)):
                 logger.warning("mcp plugin not configured: %s", exc)
             return
-        registry = kernel.resolve("tools")
+        registry = cast(Any, kernel).resolve("tools")
         for tool in tools:
             registry.register(tool)
 
     def unregister(self, kernel: object) -> None:
-        registry = kernel.resolve("tools")
+        registry = cast(Any, kernel).resolve("tools")
         for tool in self._tools or []:
             _pop_tool(registry, tool.name)
         for client in self._clients:

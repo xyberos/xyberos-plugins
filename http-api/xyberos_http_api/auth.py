@@ -33,8 +33,8 @@ def _default_urlopen(request: Any, timeout: float) -> Any:
 class ResolvedAuth:
     """Headers and query params produced by resolving an auth strategy."""
 
-    headers: dict[str, str] = field(default_factory=dict)
-    query: dict[str, str] = field(default_factory=dict)
+    headers: dict[str, str] = field(default_factory=dict[str, str])
+    query: dict[str, str] = field(default_factory=dict[str, str])
 
 
 class AuthResolver:

@@ -9,7 +9,7 @@ adapter implements exactly that; the transport is injectable for tests.
 from __future__ import annotations
 
 import os
-from typing import Any, Callable
+from typing import Any
 
 from .presets import PostCallable
 from xyberos.exceptions.provider import ProviderError
@@ -47,7 +47,10 @@ class AzureOpenAILLM:
         self._api_key = api_key if api_key is not None else os.getenv("AZURE_OPENAI_API_KEY")
         self._api_version = api_version
         self._timeout = timeout
-        self._post = post or (lambda url, payload, headers: _default_post(url, payload, headers, timeout=timeout))
+        def _post_default(url: str, payload: dict[str, Any], headers: dict[str, Any]) -> Any:
+            return _default_post(url, payload, headers, timeout=timeout)
+
+        self._post = post or _post_default
 
     def generate(self, prompt: str) -> str:
         if not self._endpoint:

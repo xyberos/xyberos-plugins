@@ -12,7 +12,7 @@ import os
 from dataclasses import dataclass
 from typing import Any, Callable
 
-from xyberos.llm import LLMProvider, OpenAICompatibleLLM
+from xyberos.llm import OpenAICompatibleLLM
 
 #: (method, url, payload, headers) -> parsed JSON body (same shape as the core).
 PostCallable = Callable[[str, dict[str, Any], dict[str, Any]], Any]

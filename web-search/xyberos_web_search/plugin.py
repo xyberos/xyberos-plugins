@@ -94,12 +94,12 @@ class WebSearchPlugin(Plugin):
         return self._tools
 
     def register(self, kernel: object) -> None:
-        registry = kernel.resolve("tools")
+        registry = cast(Any, kernel).resolve("tools")
         for tool in self.tools():
             registry.register(tool)
 
     def unregister(self, kernel: object) -> None:
-        registry = kernel.resolve("tools")
+        registry = cast(Any, kernel).resolve("tools")
         for tool in self.tools():
             _pop_tool(registry, tool.name)
 

@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
 
 from .base import Document, Loader
 from .csv_loader import CsvLoader
@@ -13,8 +12,20 @@ from .html_loader import HtmlLoader
 from .pdf_loader import PdfLoader
 from .xlsx_loader import XlsxLoader
 
+#: Any bundled loader class. Every one accepts an optional ``chunk_size`` (the
+#: first positional argument for most, a keyword argument for
+#: :class:`FileLoader`) and produces a :class:`~xyberos_documents.base.Loader`.
+LoaderClass = (
+    type[FileLoader]
+    | type[HtmlLoader]
+    | type[CsvLoader]
+    | type[PdfLoader]
+    | type[DocxLoader]
+    | type[XlsxLoader]
+)
+
 #: Extension (lowercase, no dot) -> loader class.
-LOADER_CLASSES: dict[str, type] = {
+LOADER_CLASSES: dict[str, LoaderClass] = {
     ".html": HtmlLoader,
     ".htm": HtmlLoader,
     ".pdf": PdfLoader,
@@ -25,7 +36,7 @@ LOADER_CLASSES: dict[str, type] = {
 }
 
 #: Named loaders usable from the ``ingest_document`` tool's ``loader`` argument.
-NAMED_LOADERS: dict[str, type] = {
+NAMED_LOADERS: dict[str, LoaderClass | None] = {
     "auto": None,  # resolved by extension
     "text": FileLoader,
     "html": HtmlLoader,
@@ -40,7 +51,7 @@ def loader_for(extension: str, *, chunk_size: int | None = None) -> Loader:
     """Return the loader for ``extension`` (defaults to the text ``FileLoader``)."""
     ext = str(extension).lower()
     if ext in LOADER_CLASSES:
-        return LOADER_CLASSES[ext](chunk_size=chunk_size)  # type: ignore[call-arg]
+        return LOADER_CLASSES[ext](chunk_size=chunk_size)
     return FileLoader(extensions=[ext], chunk_size=chunk_size)
 
 
@@ -52,14 +63,14 @@ def get_loader(name: str, *, chunk_size: int | None = None) -> Loader:
     cls = NAMED_LOADERS[key]
     if cls is None:  # auto
         return loader_for("*", chunk_size=chunk_size)
-    return cls(chunk_size=chunk_size)  # type: ignore[call-arg]
+    return cls(chunk_size=chunk_size)
 
 
 def load_document(path: str, *, chunk_size: int | None = None) -> list[Document]:
     """Load ``path`` using the loader that matches its extension."""
     extension = Path(path).suffix.lower()
     if extension in LOADER_CLASSES:
-        return LOADER_CLASSES[extension](chunk_size=chunk_size).load(path)  # type: ignore[call-arg]
+        return LOADER_CLASSES[extension](chunk_size=chunk_size).load(path)
     return FileLoader(chunk_size=chunk_size).load(path)
 
 

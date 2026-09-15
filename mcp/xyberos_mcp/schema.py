@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import inspect
 import re
-from typing import Any
+from typing import Any, cast
 
 from xyberos.contracts import Tool
 from xyberos.tools import FunctionTool
@@ -43,7 +43,7 @@ def _annotation(json_type: str | None) -> type:
 
 def format_tool_result(result: dict[str, Any]) -> str:
     """Extract text from an MCP ``tools/call`` result; raise on ``isError``."""
-    content = result.get("content") or []
+    content = cast(list[dict[str, Any]], result.get("content") or [])
     text = "\n".join(
         str(item.get("text", ""))
         for item in content
@@ -62,9 +62,9 @@ def build_function_tool(
     """Build one typed tool for ``tool`` on ``client`` (name ``server_tool``)."""
     tool_name = str(tool["name"])
     name = f"{server_name}_{tool_name}"
-    schema = tool.get("inputSchema") or {}
-    properties = schema.get("properties") or {}
-    required = set(schema.get("required") or [])
+    schema = cast(dict[str, Any], tool.get("inputSchema") or {})
+    properties = cast(dict[str, Any], schema.get("properties") or {})
+    required = set(cast(list[str], schema.get("required") or []))
 
     mapping: dict[str, str] = {}
     signature_params: list[inspect.Parameter] = []
@@ -92,5 +92,5 @@ def build_function_tool(
 
     _call.__name__ = name
     _call.__qualname__ = name
-    _call.__signature__ = inspect.Signature(parameters=signature_params)
+    setattr(_call, "__signature__", inspect.Signature(parameters=signature_params))
     return FunctionTool(name, _call, description=str(tool.get("description", "")))

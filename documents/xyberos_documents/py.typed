@@ -1,0 +1,11 @@
+# Marker file for PEP 561.
+#
+# Its presence tells type checkers (Pylance/Pyright, mypy) that
+# ``xyberos_documents`` ships inline type annotations and must be analyzed as a
+# typed package. Without it, strict mode reports:
+#
+#     Stub file not found for "xyberos_documents" (reportMissingTypeStubs)
+#
+# Keep this file beside the package's ``__init__.py`` (PEP 561). Setuptools'
+# default package-data handling already ships it in wheels and sdists;
+# ``pyproject.toml`` also declares it explicitly to keep the intent obvious.

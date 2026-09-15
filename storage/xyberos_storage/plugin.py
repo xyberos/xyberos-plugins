@@ -96,7 +96,7 @@ class StoragePlugin(Plugin):
             if logger is not None and callable(getattr(logger, "warning", None)):
                 logger.warning("storage plugin not configured: %s", exc)
             return
-        registry = kernel.resolve("tools")
+        registry = cast(Any, kernel).resolve("tools")
         for tool in tools:
             registry.register(tool)
 
@@ -105,7 +105,7 @@ class StoragePlugin(Plugin):
             tools = self.tools()
         except ValueError:
             return  # never configured -> nothing was registered
-        registry = kernel.resolve("tools")
+        registry = cast(Any, kernel).resolve("tools")
         for tool in tools:
             _pop_tool(registry, tool.name)
 

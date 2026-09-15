@@ -17,9 +17,14 @@ class Document:
 
 @runtime_checkable
 class Loader(Protocol):
-    """Any object that turns a path into a list of :class:`Document`."""
+    """Any object that turns a path into a list of :class:`Document`.
 
-    def load(self, path: str, **kwargs: Any) -> list[Document]: ...
+    ``load`` deliberately mirrors the exact signature every bundled loader
+    implements. Declaring ``**kwargs`` here would make each concrete loader
+    structurally incompatible with this protocol.
+    """
+
+    def load(self, path: str) -> list[Document]: ...
 
 
 def chunk_text(text: str, chunk_size: int = 512) -> list[str]:

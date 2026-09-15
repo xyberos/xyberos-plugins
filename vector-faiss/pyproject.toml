@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "xyberos-faiss"
-version = "0.1.0"
+version = "0.1.1"
 description = "FAISS VectorStore plugin (RFC-0019, M4): local, dependency-free-of-server vector search"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -21,6 +21,12 @@ faiss = "xyberos_faiss.plugin:plugin"
 
 [tool.setuptools]
 packages = ["xyberos_faiss"]
+
+[tool.setuptools.package-data]
+# PEP 561 marker: ships inline type annotations to consumers.
+# Setuptools' default already includes it; declared explicitly so
+# the intent survives a change to that default.
+xyberos_faiss = ["py.typed"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

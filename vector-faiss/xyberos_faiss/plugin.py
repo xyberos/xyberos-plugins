@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import os
-from typing import Any
+from typing import Any, cast
 
-from xyberos.contracts import Plugin, VectorStore
+from xyberos.contracts import Plugin
 
 from .vector import FaissVectorStore
 
@@ -32,7 +32,7 @@ class FaissPlugin(Plugin):
         return self._store
 
     def register(self, kernel: object) -> None:
-        kernel.register("vector_store", self.vector_store(), replace=True)
+        cast(Any, kernel).register("vector_store", self.vector_store(), replace=True)
 
     def unregister(self, kernel: object) -> None:
         pass

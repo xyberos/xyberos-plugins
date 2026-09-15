@@ -12,7 +12,7 @@ import html
 import os
 import urllib.parse
 from html.parser import HTMLParser
-from typing import Any
+from typing import Any, cast
 
 from xyberos.exceptions.provider import ProviderError
 
@@ -98,7 +98,7 @@ class SerperSearch(_BaseSearch):
             "POST",
             self.url,
             json_body={"q": query, "num": top_k},
-            headers={"X-API-KEY": self._api_key},
+            headers={"X-API-KEY": cast(str, self._api_key)},
             timeout=self._timeout,
         )
         _raise_for_status(status, body)
@@ -124,11 +124,12 @@ class BraveSearch(_BaseSearch):
             "GET",
             self.url,
             query={"q": query, "count": top_k},
-            headers={"X-Subscription-Token": self._api_key},
+            headers={"X-Subscription-Token": cast(str, self._api_key)},
             timeout=self._timeout,
         )
         _raise_for_status(status, body)
-        results = (body.get("web") or {}).get("results", []) if isinstance(body, dict) else []
+        payload = cast(dict[str, Any], body) if isinstance(body, dict) else {}
+        results = cast(list[dict[str, Any]], payload.get("web", {}).get("results", []))
         return [
             SearchResult(
                 title=str(item.get("title", "")),
@@ -151,7 +152,7 @@ class ExaSearch(_BaseSearch):
             "POST",
             self.url,
             json_body={"query": query, "numResults": top_k},
-            headers={"x-api-key": self._api_key},
+            headers={"x-api-key": cast(str, self._api_key)},
             timeout=self._timeout,
         )
         _raise_for_status(status, body)
@@ -204,12 +205,12 @@ class _DdgParser(HTMLParser):
         self._in_snippet = False
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
-        attrs = dict(attrs)
-        classes = (attrs.get("class") or "").split()
+        attr_map = dict(attrs)
+        classes = (attr_map.get("class") or "").split()
         if tag == "a" and "result-link" in classes:
             self._current = {
                 "title": "",
-                "url": self._clean_url(attrs.get("href") or ""),
+                "url": self._clean_url(attr_map.get("href") or ""),
             }
             self._in_link = True
             self._buf = []

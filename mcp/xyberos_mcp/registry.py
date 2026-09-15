@@ -11,9 +11,9 @@ from __future__ import annotations
 import importlib
 import json
 import os
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any, Mapping, cast
 
 from xyberos.exceptions.provider import ProviderError
 
@@ -66,9 +66,9 @@ def load_servers(source: Any) -> list[ServerConfig]:
     if isinstance(source, (str, Path)):
         return _servers_from_file(source)
     if isinstance(source, Mapping):
-        return [server_from_dict(name, data) for name, data in source.items()]
+        return [server_from_dict(name, data) for name, data in cast(Mapping[str, Any], source).items()]
     if isinstance(source, (list, tuple)):
-        return [server_from_dict(item["name"], item) for item in source]
+        return [server_from_dict(str(item["name"]), item) for item in cast(list[Mapping[str, Any]], source)]
     raise TypeError("servers must be a mapping, a list, or a path to a JSON/YAML file")
 
 

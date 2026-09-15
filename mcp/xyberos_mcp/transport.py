@@ -12,7 +12,7 @@ import json
 import os
 import subprocess
 import threading
-from typing import Any
+from typing import Any, cast
 
 from .errors import McpError, McpTimeoutError
 from .http import RequestTransport, default_request
@@ -176,7 +176,7 @@ class HttpTransport:
             timeout=self._timeout,
         )
         if isinstance(body, dict):
-            return body
+            return cast(dict[str, Any], body)
         messages = _parse_sse(body)
         for message in messages:
             if message.get("id") == id:

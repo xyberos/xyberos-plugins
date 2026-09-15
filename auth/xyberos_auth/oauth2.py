@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import urllib.parse
-from typing import Any
+from typing import Any, cast
 
 from .errors import AuthError
 from .http import RequestTransport, default_request
@@ -93,4 +93,4 @@ class OAuth2Client:
         _raise_for_status(status, body)
         if not isinstance(body, dict) or "access_token" not in body:
             raise AuthError(f"token endpoint returned an unexpected response: {body}")
-        return body
+        return cast(dict[str, Any], body)

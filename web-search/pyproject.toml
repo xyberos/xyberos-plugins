@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "xyberos-web-search"
-version = "0.2.0"
+version = "0.2.1"
 description = "Web search abstraction plugin (RFC-0019, M5): one WebSearch contract, free DuckDuckGo (default) + Tavily/Serper/Brave/Exa/Firecrawl behind it"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -17,6 +17,12 @@ web_search = "xyberos_web_search.plugin:plugin"
 
 [tool.setuptools]
 packages = ["xyberos_web_search"]
+
+[tool.setuptools.package-data]
+# PEP 561 marker: ships inline type annotations to consumers.
+# Setuptools' default already includes it; declared explicitly so
+# the intent survives a change to that default.
+xyberos_web_search = ["py.typed"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

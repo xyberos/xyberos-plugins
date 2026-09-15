@@ -77,12 +77,12 @@ class AuthPlugin(Plugin):
             if logger is not None and callable(getattr(logger, "warning", None)):
                 logger.warning("auth plugin not configured: %s", exc)
             return
-        registry = kernel.resolve("tools")
+        registry = cast(Any, kernel).resolve("tools")
         for tool in self.tools():
             registry.register(tool)
 
     def unregister(self, kernel: object) -> None:
-        registry = kernel.resolve("tools")
+        registry = cast(Any, kernel).resolve("tools")
         for tool in self.tools():
             _pop_tool(registry, tool.name)
 

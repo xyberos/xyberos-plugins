@@ -8,7 +8,7 @@ import hmac
 import importlib
 import json
 import time
-from typing import Any
+from typing import Any, cast
 
 from xyberos.exceptions.provider import ProviderError
 
@@ -85,7 +85,7 @@ class JwtCodec:
 
     def _sign(self, alg: str, data: bytes) -> bytes:
         if alg == "HS256":
-            return hmac.new(self._secret.encode("utf-8"), data, hashlib.sha256).digest()
+            return hmac.new(cast(str, self._secret).encode("utf-8"), data, hashlib.sha256).digest()
         if alg == "RS256":
             return self._rsa_sign(data)
         raise AuthError(f"unsupported JWT algorithm: {alg}")
@@ -102,20 +102,22 @@ class JwtCodec:
         raise AuthError(f"unsupported JWT algorithm: {alg}")
 
     def _rsa_sign(self, data: bytes) -> bytes:
-        primitives, asymmetric, padding, serialization, hashes = self._rsa_modules()
-        key = serialization.load_pem_private_key(self._private_key.encode("utf-8"), password=None)
+        padding, serialization, hashes = self._rsa_modules()
+        key = serialization.load_pem_private_key(
+            cast(str, self._private_key).encode("utf-8"), password=None
+        )
         return key.sign(data, padding.PKCS1v15(), hashes.SHA256())
 
     def _rsa_verify(self, data: bytes, signature: bytes) -> None:
-        primitives, asymmetric, padding, serialization, hashes = self._rsa_modules()
-        key = serialization.load_pem_public_key(self._public_key.encode("utf-8"))
+        padding, serialization, hashes = self._rsa_modules()
+        key = serialization.load_pem_public_key(cast(str, self._public_key).encode("utf-8"))
         try:
             key.verify(signature, data, padding.PKCS1v15(), hashes.SHA256())
         except Exception as exc:
             raise AuthError("JWT signature verification failed") from exc
 
     @staticmethod
-    def _rsa_modules() -> tuple[Any, Any, Any, Any, Any]:
+    def _rsa_modules() -> tuple[Any, Any, Any]:
         """Lazily import the ``cryptography`` modules for RS256 (optional dep)."""
         try:
             primitives = importlib.import_module("cryptography.hazmat.primitives")
@@ -125,4 +127,4 @@ class JwtCodec:
                 "RS256 requires 'cryptography'; install with "
                 "'pip install xyberos-auth[rsa]'"
             ) from exc
-        return primitives, asymmetric, asymmetric.padding, primitives.serialization, primitives.hashes
+        return asymmetric.padding, primitives.serialization, primitives.hashes

@@ -17,12 +17,16 @@ class Database(Protocol):
 
     def connect(self) -> None:
         """Open the connection."""
+        ...
 
     def list_tables(self) -> list[str]:
         """Return the schema's table names."""
+        ...
 
     def query(self, sql: str, params: list[Any] | None = None) -> list[dict[str, Any]]:
         """Execute ``sql`` and return rows as dicts."""
+        ...
 
     def close(self) -> None:
         """Release the connection."""
+        ...

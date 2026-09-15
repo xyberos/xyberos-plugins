@@ -9,7 +9,7 @@ and correlation are handled here; transports live in :mod:`transport`.
 from __future__ import annotations
 
 import threading
-from typing import Any
+from typing import Any, cast
 
 from .errors import McpError
 from .registry import ServerConfig
@@ -133,7 +133,7 @@ class McpClient:
         result = message.get("result")
         if not isinstance(result, dict):
             raise McpError(f"{method} returned a non-object result")
-        return result
+        return cast(dict[str, Any], result)
 
     def _next_id(self) -> int:
         with self._id_lock:

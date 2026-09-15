@@ -10,7 +10,6 @@ from __future__ import annotations
 import re
 from html.parser import HTMLParser
 from pathlib import Path
-from typing import Any
 
 from .base import Document, chunk_documents
 

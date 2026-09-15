@@ -8,7 +8,7 @@ missing.
 from __future__ import annotations
 
 import importlib
-from typing import Any
+from typing import Any, cast
 
 from xyberos.exceptions.provider import ProviderError
 
@@ -46,8 +46,9 @@ class SqliteDatabase:
 
     def query(self, sql: str, params: list[Any] | None = None) -> list[dict[str, Any]]:
         cursor = self._connection.execute(sql, tuple(params or ()))
-        columns = [description[0] for description in (cursor.description or [])]
-        return [dict(zip(columns, row)) for row in cursor.fetchall()]
+        columns = [column[0] for column in cast(list[tuple[Any, ...]], cursor.description or [])]
+        rows = cast(list[tuple[Any, ...]], cursor.fetchall())
+        return [dict(zip(columns, row)) for row in rows]
 
     def close(self) -> None:
         if self._connection is not None:
@@ -78,8 +79,9 @@ class PostgresDatabase:
     def query(self, sql: str, params: list[Any] | None = None) -> list[dict[str, Any]]:
         with self._connection.cursor() as cursor:
             cursor.execute(sql, tuple(params or ()))
-            columns = [description.name for description in (cursor.description or [])]
-            return [dict(zip(columns, row)) for row in cursor.fetchall()]
+            columns = [column.name for column in cast(list[Any], cursor.description or [])]
+            rows = cast(list[tuple[Any, ...]], cursor.fetchall())
+            return [dict(zip(columns, row)) for row in rows]
 
     def close(self) -> None:
         if self._connection is not None:
@@ -124,8 +126,9 @@ class MysqlDatabase:
     def query(self, sql: str, params: list[Any] | None = None) -> list[dict[str, Any]]:
         with self._connection.cursor() as cursor:
             cursor.execute(sql, tuple(params or ()))
-            columns = [description[0] for description in (cursor.description or [])]
-            return [dict(zip(columns, row)) for row in cursor.fetchall()]
+            columns = [column[0] for column in cast(list[tuple[Any, ...]], cursor.description or [])]
+            rows = cast(list[tuple[Any, ...]], cursor.fetchall())
+            return [dict(zip(columns, row)) for row in rows]
 
     def close(self) -> None:
         if self._connection is not None:
@@ -153,8 +156,9 @@ class DuckdbDatabase:
 
     def query(self, sql: str, params: list[Any] | None = None) -> list[dict[str, Any]]:
         result = self._connection.execute(sql, params or [])
-        columns = [description[0] for description in (result.description or [])]
-        return [dict(zip(columns, row)) for row in result.fetchall()]
+        columns = [column[0] for column in cast(list[tuple[Any, ...]], result.description or [])]
+        rows = cast(list[tuple[Any, ...]], result.fetchall())
+        return [dict(zip(columns, row)) for row in rows]
 
     def close(self) -> None:
         if self._connection is not None:

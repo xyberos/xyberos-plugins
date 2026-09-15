@@ -92,3 +92,14 @@ not installed — the same pattern as the core's `test_sentence_embedder.py`.
   Core); `PdfLoader` / `DocxLoader` / `XlsxLoader` map to the `[documents]`
   extra.
 - **Dependencies:** `xyberos>=1.0`; optional `[documents]` for binary formats.
+
+## Typing
+
+This package is fully inline-annotated and ships a [PEP 561][pep561] `py.typed`
+marker, so Pylance/Pyright and mypy analyze it as a typed package. The marker is
+also declared under `[tool.setuptools.package-data]` to keep the intent
+explicit. Strict-mode consumers do not need `reportMissingTypeStubs`
+suppressions or `python.analysis.useLibraryCodeForTypes` overrides for
+`from xyberos_documents import DocumentsPlugin`.
+
+[pep561]: https://peps.python.org/pep-0561/

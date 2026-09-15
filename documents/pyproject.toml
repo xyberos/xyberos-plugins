@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "xyberos-documents"
-version = "0.1.0"
+version = "0.1.1"
 description = "Filesystem + document loaders plugin (M1): PDF, DOCX, HTML, CSV, XLSX -> IngestingKnowledge"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -27,6 +27,16 @@ documents = "xyberos_documents.plugin:plugin"
 
 [tool.setuptools]
 packages = ["xyberos_documents"]
+
+[tool.setuptools.package-data]
+# PEP 561 marker: tells Pylance/Pyright and mypy that this package ships inline
+# annotations, so strict mode does not report reportMissingTypeStubs on
+# ``from xyberos_documents import DocumentsPlugin``.
+#
+# Belt-and-braces: setuptools' default package-data handling already includes
+# ``py.typed`` in wheels/sdists, so this declaration is not strictly required.
+# It is kept so the intent is explicit and survives a change to that default.
+xyberos_documents = ["py.typed"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

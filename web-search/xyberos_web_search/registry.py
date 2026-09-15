@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any
+from collections.abc import Callable
 
 from .adapters import (
     BraveSearch,
@@ -15,8 +15,13 @@ from .adapters import (
 from .contract import WebSearch
 from .http import RequestTransport
 
+#: provider key -> adapter class. ``Callable[..., WebSearch]`` (rather than
+#: ``type[WebSearch]``) because adapters take keyword constructor args the
+#: protocol does not declare.
+WebSearchFactory = Callable[..., WebSearch]
+
 #: provider key -> adapter class
-PROVIDERS: dict[str, type[WebSearch]] = {
+PROVIDERS: dict[str, WebSearchFactory] = {
     "tavily": TavilySearch,
     "serper": SerperSearch,
     "brave": BraveSearch,
