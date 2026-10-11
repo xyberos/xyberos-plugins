@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "xyberos-tts"
-version = "0.1.1"
+version = "0.1.2"
 description = "Text-to-speech plugin (RFC-0019, M8): ElevenLabs/OpenAI/Polly/Piper"
 readme = "README.md"
 requires-python = ">=3.10"

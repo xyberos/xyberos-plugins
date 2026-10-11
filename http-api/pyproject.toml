@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "xyberos-http-api"
-version = "0.1.1"
+version = "0.1.2"
 description = "Generic HTTP/API connector plugin (M2): point at any REST API, get typed tools"
 readme = "README.md"
 requires-python = ">=3.10"

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "xyberos-redis"
-version = "0.1.1"
+version = "0.1.2"
 description = "Redis plugin (RFC-0019, M4): RedisVectorStore + RedisMemory + cache backing for CacheResponder"
 readme = "README.md"
 requires-python = ">=3.10"

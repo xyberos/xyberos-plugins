@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "xyberos-llm-providers"
-version = "0.1.1"
+version = "0.1.2"
 description = "Remaining LLM providers plugin (RFC-0019, M6): OpenAI-compatible presets + Bedrock + Vertex, no new architecture"
 readme = "README.md"
 requires-python = ">=3.10"

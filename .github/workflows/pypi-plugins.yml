@@ -156,7 +156,7 @@ jobs:
       - name: Type check plugin (strict)
         working-directory: ${{ matrix.plugin }}
         run: |
-          python -m pip install pyright "xyberos>=1.0"
+          python -m pip install pyright "xyberos>=1.0,<2"
           package=$(python -c "import pathlib, tomllib; print(tomllib.loads(pathlib.Path('pyproject.toml').read_text())['tool']['setuptools']['packages'][0])")
           python -m pyright "$package"
 

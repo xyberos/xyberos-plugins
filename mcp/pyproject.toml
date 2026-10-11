@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "xyberos-mcp"
-version = "0.2.1"
+version = "0.2.2"
 description = "Model Context Protocol plugin (RFC-0019, M3): stdio + streamable HTTP client, one Tool per server tool, and expose() to serve an app's tools as an MCP server"
 readme = "README.md"
 requires-python = ">=3.10"

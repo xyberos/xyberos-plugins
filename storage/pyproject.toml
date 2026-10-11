@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "xyberos-storage"
-version = "0.1.1"
+version = "0.1.2"
 description = "Object storage plugin (RFC-0019, M9): S3, Azure Blob, GCS, OneDrive behind one ObjectStore contract"
 readme = "README.md"
 requires-python = ">=3.10"

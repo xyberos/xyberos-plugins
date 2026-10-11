@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "xyberos-observability"
-version = "0.1.1"
+version = "0.1.2"
 description = "Observability exporters plugin (RFC-0019, M10): OTel, Prometheus, Langfuse, Sentry as thin EventBus exporters"
 readme = "README.md"
 requires-python = ">=3.10"

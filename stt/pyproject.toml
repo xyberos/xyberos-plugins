@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "xyberos-stt"
-version = "0.1.1"
+version = "0.1.2"
 description = "Speech-to-text plugin (RFC-0019, M8): local Whisper + Deepgram/AssemblyAI"
 readme = "README.md"
 requires-python = ">=3.10"

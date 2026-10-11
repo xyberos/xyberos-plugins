@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "xyberos-vision"
-version = "0.1.1"
+version = "0.1.2"
 description = "Vision plugin (RFC-0019, M8): describe images, OCR, generate images"
 readme = "README.md"
 requires-python = ">=3.10"

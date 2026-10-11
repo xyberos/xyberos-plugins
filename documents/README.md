@@ -91,7 +91,7 @@ not installed — the same pattern as the core's `test_sentence_embedder.py`.
 - **Ship:** `FileLoader` / `HtmlLoader` / `CsvLoader` are stdlib (would be
   Core); `PdfLoader` / `DocxLoader` / `XlsxLoader` map to the `[documents]`
   extra.
-- **Dependencies:** `xyberos>=1.0`; optional `[documents]` for binary formats.
+- **Dependencies:** `xyberos>=1.0,<2`; optional `[documents]` for binary formats.
 
 ## Typing
 

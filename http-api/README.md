@@ -112,4 +112,4 @@ no external network required.
 
 - **Contract:** `Tool` (`FunctionTool` public API only).
 - **Ship:** Plugin (`xyberos.plugins` entry point).
-- **Dependencies:** `xyberos>=1.0`; everything else is standard library.
+- **Dependencies:** `xyberos>=1.0,<2`; everything else is standard library.

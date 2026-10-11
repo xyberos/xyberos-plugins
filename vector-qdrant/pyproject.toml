@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "xyberos-qdrant"
-version = "0.1.1"
+version = "0.1.2"
 description = "Qdrant VectorStore plugin (RFC-0019, M4): hosted or in-memory Qdrant as an xyberos VectorStore"
 readme = "README.md"
 requires-python = ">=3.10"

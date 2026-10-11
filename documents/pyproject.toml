@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "xyberos-documents"
-version = "0.1.1"
+version = "0.1.2"
 description = "Filesystem + document loaders plugin (M1): PDF, DOCX, HTML, CSV, XLSX -> IngestingKnowledge"
 readme = "README.md"
 requires-python = ">=3.10"

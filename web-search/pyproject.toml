@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "xyberos-web-search"
-version = "0.2.1"
+version = "0.2.2"
 description = "Web search abstraction plugin (RFC-0019, M5): one WebSearch contract, free DuckDuckGo (default) + Tavily/Serper/Brave/Exa/Firecrawl behind it"
 readme = "README.md"
 requires-python = ">=3.10"

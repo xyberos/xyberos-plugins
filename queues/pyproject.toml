@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "xyberos-queues"
-version = "0.1.1"
+version = "0.1.2"
 description = "Message queue plugin (RFC-0019, M9): Redis Streams, RabbitMQ, Kafka behind one MessageQueue contract"
 readme = "README.md"
 requires-python = ">=3.10"
