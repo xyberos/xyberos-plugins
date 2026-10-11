@@ -9,7 +9,7 @@ description = "Linear GraphQL plugin (RFC-0019, M7): search and create issues"
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "Apache-2.0"}
-dependencies = ["xyberos>=1.0"]
+dependencies = ["xyberos>=1.0,<2"]
 keywords = ["xyberos", "plugin", "linear", "tool"]
 
 [project.entry-points."xyberos.plugins"]

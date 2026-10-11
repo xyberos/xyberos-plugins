@@ -9,7 +9,7 @@ description = "Remaining LLM providers plugin (RFC-0019, M6): OpenAI-compatible 
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "Apache-2.0"}
-dependencies = ["xyberos>=1.0"]
+dependencies = ["xyberos>=1.0,<2"]
 keywords = ["xyberos", "plugin", "llm", "mistral", "groq", "deepseek", "cohere", "together", "xai", "azure", "bedrock", "vertex"]
 
 [project.optional-dependencies]

@@ -9,7 +9,7 @@ description = "Text-to-speech plugin (RFC-0019, M8): ElevenLabs/OpenAI/Polly/Pip
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "Apache-2.0"}
-dependencies = ["xyberos>=1.0"]
+dependencies = ["xyberos>=1.0,<2"]
 keywords = ["xyberos", "plugin", "tts", "speech", "elevenlabs", "openai", "polly", "piper"]
 
 [project.optional-dependencies]

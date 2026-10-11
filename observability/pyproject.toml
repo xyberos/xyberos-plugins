@@ -9,7 +9,7 @@ description = "Observability exporters plugin (RFC-0019, M10): OTel, Prometheus,
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "Apache-2.0"}
-dependencies = ["xyberos>=1.0"]
+dependencies = ["xyberos>=1.0,<2"]
 keywords = ["xyberos", "plugin", "observability", "opentelemetry", "prometheus", "langfuse", "sentry"]
 
 [project.optional-dependencies]

@@ -9,7 +9,7 @@ description = "Web search abstraction plugin (RFC-0019, M5): one WebSearch contr
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "Apache-2.0"}
-dependencies = ["xyberos>=1.0"]
+dependencies = ["xyberos>=1.0,<2"]
 keywords = ["xyberos", "plugin", "web", "search", "duckduckgo", "tavily", "serper", "brave", "exa", "firecrawl"]
 
 [project.entry-points."xyberos.plugins"]

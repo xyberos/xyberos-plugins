@@ -9,7 +9,7 @@ description = "Speech-to-text plugin (RFC-0019, M8): local Whisper + Deepgram/As
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "Apache-2.0"}
-dependencies = ["xyberos>=1.0"]
+dependencies = ["xyberos>=1.0,<2"]
 keywords = ["xyberos", "plugin", "stt", "speech", "whisper", "deepgram", "assemblyai"]
 
 [project.optional-dependencies]

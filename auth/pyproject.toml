@@ -9,7 +9,7 @@ description = "Auth plugin (RFC-0019, M9): OAuth2, OIDC, JWT with Auth0/Okta/Ent
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "Apache-2.0"}
-dependencies = ["xyberos>=1.0"]
+dependencies = ["xyberos>=1.0,<2"]
 keywords = ["xyberos", "plugin", "auth", "oauth2", "oidc", "jwt", "sso"]
 
 [project.optional-dependencies]

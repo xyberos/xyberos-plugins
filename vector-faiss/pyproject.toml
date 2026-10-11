@@ -9,7 +9,7 @@ description = "FAISS VectorStore plugin (RFC-0019, M4): local, dependency-free-o
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "Apache-2.0"}
-dependencies = ["xyberos>=1.0"]
+dependencies = ["xyberos>=1.0,<2"]
 keywords = ["xyberos", "plugin", "vector", "faiss", "rag"]
 
 [project.optional-dependencies]

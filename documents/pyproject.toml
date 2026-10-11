@@ -9,7 +9,7 @@ description = "Filesystem + document loaders plugin (M1): PDF, DOCX, HTML, CSV, 
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "Apache-2.0"}
-dependencies = ["xyberos>=1.0"]
+dependencies = ["xyberos>=1.0,<2"]
 keywords = ["xyberos", "plugin", "documents", "loader", "knowledge", "ingestion"]
 
 [project.optional-dependencies]
