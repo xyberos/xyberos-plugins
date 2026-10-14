@@ -64,6 +64,12 @@ jobs:
     outputs:
       plugins: ${{ steps.select.outputs.plugins }}
     steps:
+      # The selection is read from the tree, so the tree has to be present. Without this the globs find
+      # nothing, nothing matches the input, and the matrix comes out empty — which GitHub fails on with no
+      # publish job at all, so the run reports "failure" and names no cause.
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Determine which plugins to publish
         id: select
         env:
@@ -93,41 +99,64 @@ jobs:
               return sorted(found)
 
           all_plugins = discover()
-          print(f"discovered: {all_plugins}")
+          print(f"discovered {len(all_plugins)}: {all_plugins}")
+          if not all_plugins:
+              raise SystemExit(
+                  "no distribution found in the workspace: the checkout step is what puts them there, "
+                  "and an empty matrix fails the run with no publish job to show why"
+              )
 
-          def under(prefix):
-              return [d for d in all_plugins if d == prefix or d.startswith(prefix + "/")]
+          def under(name):
+              """What `name` selects: the directory itself, or anything inside it.
+
+              A name may be a path (`templates`, `db/xyberos_postgres`) or a
+              distribution's own directory name (`xyberos_postgres`), spelled with
+              underscores or the hyphens PyPI uses, because each is what a person types.
+              """
+              wanted = {name, name.replace("-", "_")}
+              return [
+                  directory
+                  for directory in all_plugins
+                  if directory in wanted
+                  or any(directory.startswith(f"{prefix}/") for prefix in wanted)
+                  or directory.split("/")[-1] in wanted
+              ]
+
+          def selected_or_fail(names):
+              """Resolve names to directories, and refuse rather than guess.
+
+              There is no fallback to "every distribution": a typo that silently published
+              all 23 is worse than a failed run that lists what it knows about.
+              """
+              selected = sorted({directory for name in names for directory in under(name)})
+              if not selected:
+                  known = ", ".join(all_plugins)
+                  raise SystemExit(
+                      f"nothing matches {', '.join(repr(name) for name in names)}; "
+                      f"the known directories are: {known}"
+                  )
+              return selected
 
           event = os.environ["EVENT_NAME"]
           ref = os.environ["GITHUB_REF"]
           dispatch_input = os.environ.get("DISPATCH_INPUT", "")
 
           if event == "workflow_dispatch":
-              # Manual run: empty input = every distribution; otherwise the named
-              # directories, where naming a subject publishes what is inside it.
-              if not dispatch_input.strip():
-                  selected = all_plugins
-              else:
-                  chosen = [p.strip().strip("/") for p in dispatch_input.split(",") if p.strip()]
-                  selected = sorted({d for name in chosen for d in under(name)})
-                  if not selected:
-                      print("No valid directory matched; publishing every distribution.")
-                      selected = all_plugins
+              # Manual run: an empty input means every distribution; otherwise the
+              # named directories, where naming a subject publishes what is inside it.
+              names = [p.strip().strip("/") for p in dispatch_input.split(",") if p.strip()]
+              selected = all_plugins if not names else selected_or_fail(names)
           else:
               # Tag push: the tag names a directory, and the version is its last segment.
               #   db/xyberos_postgres/v0.1.0 -> db/xyberos_postgres
               #   db/v0.1.0                  -> every distribution under db/
               #   v0.1.0                     -> every distribution
               tag = ref[len("refs/tags/"):]
-              if "/" not in tag:
-                  selected = all_plugins
-              else:
-                  prefix = tag.rsplit("/", 1)[0]
-                  selected = under(prefix)
-                  if not selected:
-                      print(f"No distribution under {prefix!r}; publishing every distribution.")
-                      selected = all_plugins
+              selected = (
+                  all_plugins if "/" not in tag else selected_or_fail([tag.rsplit("/", 1)[0]])
+              )
 
+          print(f"selected {len(selected)}: {selected}")
           with open(os.environ["GITHUB_OUTPUT"], "a") as f:
               f.write("plugins=" + json.dumps(selected) + "\n")
           PYEOF
@@ -175,16 +204,14 @@ jobs:
           sys.exit(0 if in_wheel and in_sdist else 1)
           PYEOF
 
-      # Blocking: every distribution is strict-clean (verified 23/23), so a
-      # type regression fails the release instead of shipping. Both the core
-      # range and the import root are read from the distribution's own
-      # pyproject.toml: this repository now holds two lines, and a 2.x
-      # distribution checked against 1.x would be checked against code it never
-      # runs on. A 2.x distribution cannot resolve its range before the core
-      # release exists, and failing here is the correct ordering rather than a
-      # gap. If pyright or PyPI are ever unreachable this will block
-      # publication; re-add `continue-on-error: true` to downgrade it to
-      # advisory-only.
+      # Blocking: a type regression fails the release instead of shipping. The import root is read from the
+      # distribution's own pyproject.toml, and the distribution is installed before it is checked, so
+      # strict mode sees the dependencies and the core range it declares. This repository holds two lines: a
+      # 2.x distribution checked against 1.x would be checked against code it never runs on, and installing
+      # the distribution is what makes that impossible. A 2.x distribution cannot resolve its range before
+      # the core release exists, and failing here is the correct ordering rather than a gap. If pyright or
+      # PyPI are ever unreachable this will block publication; re-add `continue-on-error: true` to downgrade
+      # it to advisory-only.
       - name: Type check distribution (strict)
         working-directory: ${{ matrix.plugin }}
         run: |
@@ -194,14 +221,15 @@ jobs:
 
           data = tomllib.loads(pathlib.Path("pyproject.toml").read_text())
           project = data["project"]
-          # What the distribution declares is what its users install, so it is what its types are
-          # checked against.
-          declared = [item for item in project.get("dependencies", []) if item.startswith("xyberos")]
-          print("CORE_REQUIREMENT=" + (declared[0] if declared else "xyberos>=1.0"))
           packages = data.get("tool", {}).get("setuptools", {}).get("packages")
           print("IMPORT_ROOT=" + (packages[0] if packages else project["name"].replace("-", "_")))
           PYEOF
-          python -m pip install pyright "$CORE_REQUIREMENT"
+          # The distribution is installed, not only its source tree checked. Strict mode resolves every
+          # import, so a dependency that is not present is a `reportMissingImports` error: checking a
+          # distribution against the core alone fails on `jinja2`, `sqlalchemy`, or any other library it
+          # declares. Installing it also puts the core range it declares in front of the checker, so the
+          # range is proved rather than assumed.
+          python -m pip install pyright -e .
           python -m pyright "$IMPORT_ROOT"
 
       - name: Publish to PyPI
