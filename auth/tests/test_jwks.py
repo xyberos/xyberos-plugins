@@ -250,7 +250,7 @@ def test_the_jwks_document_cannot_be_changed_after_the_settings_are_built() -> N
 
     keys = verifier.settings.jwks["keys"]
     assert isinstance(keys, tuple)
-    assert len(keys) == 1, "the settings kept their own copy"
+    assert len(cast("tuple[object, ...]", keys)) == 1, "the settings kept their own copy"
     assert verifier.verify(_rs256(_claims(), kid=None)).subject == "ada"
     with pytest.raises(RequestValidationError, match="no key with kid 'sneaky'"):
         verifier.verify(_rs256(_claims(), kid="sneaky"))

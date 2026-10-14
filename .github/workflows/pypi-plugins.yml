@@ -204,39 +204,24 @@ jobs:
           sys.exit(0 if in_wheel and in_sdist else 1)
           PYEOF
 
-      # Blocking: a type regression fails the release instead of shipping. The import root is read from the
-      # distribution's own pyproject.toml, and the distribution is installed before it is checked, so
-      # strict mode sees the dependencies and the core range it declares. This repository holds two lines: a
-      # 2.x distribution checked against 1.x would be checked against code it never runs on, and installing
-      # the distribution is what makes that impossible. A 2.x distribution cannot resolve its range before
-      # the core release exists, and failing here is the correct ordering rather than a gap. If pyright or
-      # PyPI are ever unreachable this will block publication; re-add `continue-on-error: true` to downgrade
-      # it to advisory-only.
+      # Blocking: a type regression fails the release instead of shipping. The distribution is installed
+      # before it is checked, so strict mode sees the dependencies and the core range it declares — this
+      # repository holds two lines, and a 2.x distribution checked against 1.x would be checked against
+      # code it never runs on. A 2.x distribution cannot resolve its range before the core release exists,
+      # and failing here is the correct ordering rather than a gap. If pyright or PyPI are ever unreachable
+      # this will block publication; re-add `continue-on-error: true` to downgrade it to advisory-only.
+      #
+      # The check is scoped to the package rather than the whole directory, which the distribution's own
+      # metadata names. The tests are each package's own CI's business: three of the seven need a live
+      # service to run at all, and their type-cleanliness is a separate job rather than a publish gate.
+      # Note the assignment below: a variable written to `$GITHUB_ENV` is only in scope for *later* steps,
+      # so the import root is computed in the shell that uses it.
       - name: Type check distribution (strict)
         working-directory: ${{ matrix.plugin }}
         run: |
-          python - <<'PYEOF' >> "$GITHUB_ENV"
-          import pathlib
-          import tomllib
-
-          data = tomllib.loads(pathlib.Path("pyproject.toml").read_text())
-          project = data["project"]
-          packages = data.get("tool", {}).get("setuptools", {}).get("packages")
-          print("IMPORT_ROOT=" + (packages[0] if packages else project["name"].replace("-", "_")))
-          PYEOF
-          # The distribution is installed, not only its source tree checked. Strict mode resolves every
-          # import, so a dependency that is not present is an error: checking a distribution against the
-          # core alone fails on `jinja2`, `sqlalchemy`, or any other library it declares. Installing it
-          # also puts the core range it declares in front of the checker, so the range is proved rather
-          # than assumed.
-          #
-          # pytest is installed because this step type-checks the tests as well as the package: a
-          # distribution's own pyright config states no `include`, so the checker's project is the whole
-          # directory. Any other import only the tests need therefore has to be a declared dependency of
-          # the distribution — which is why `xyberos-observability` declares the `http` extra that its
-          # request-span test and its README example use.
-          python -m pip install pyright pytest -e .
-          python -m pyright "$IMPORT_ROOT"
+          python -m pip install pyright -e .
+          package=$(python -c "import pathlib, tomllib; data = tomllib.loads(pathlib.Path('pyproject.toml').read_text()); project = data['project']; packages = data.get('tool', {}).get('setuptools', {}).get('packages'); print(packages[0] if packages else project['name'].replace('-', '_'))")
+          python -m pyright "$package"
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
