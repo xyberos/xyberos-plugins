@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "xyberos-templates"
+version = "0.1.0"
+description = "Server-rendered pages for a Xyberos application: render off the event loop, autoescape stated rather than inherited"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "Apache-2.0"}
+dependencies = [
+    "xyberos[http]>=2,<3",
+    "jinja2>=3.1,<4",
+    "python-multipart>=0.0.18,<1",
+]
+keywords = ["xyberos", "templates", "jinja2", "server-side-rendering", "html", "http"]
+
+[project.urls]
+Documentation = "https://docs.xyberos.com/"
+Repository = "https://github.com/xyberos/xyberos-plugins"
+Issues = "https://github.com/xyberos/xyberos-plugins/issues"
+
+[tool.setuptools]
+packages = ["xyberos_templates"]
+
+[tool.setuptools.package-data]
+xyberos_templates = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

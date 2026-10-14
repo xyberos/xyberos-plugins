@@ -4,28 +4,23 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "xyberos-auth"
-version = "0.1.2"
-description = "Auth plugin (RFC-0019, M9): OAuth2, OIDC, JWT with Auth0/Okta/Entra presets"
+version = "0.2.0"
+description = "Verification only: an assertion from a shared secret or a JWKS, and a Principal"
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "Apache-2.0"}
-dependencies = ["xyberos>=1.0,<2"]
-keywords = ["xyberos", "plugin", "auth", "oauth2", "oidc", "jwt", "sso"]
+dependencies = ["xyberos>=2,<3", "cryptography>=42,<47"]
+keywords = ["xyberos", "auth", "assertion", "jwt", "jws", "jwks", "verification", "principal"]
 
-[project.optional-dependencies]
-rsa = ["cryptography"]
-test = ["pytest"]
-
-[project.entry-points."xyberos.plugins"]
-auth = "xyberos_auth.plugin:plugin"
+[project.urls]
+Documentation = "https://docs.xyberos.com/"
+Repository = "https://github.com/xyberos/xyberos-plugins"
+Issues = "https://github.com/xyberos/xyberos-plugins/issues"
 
 [tool.setuptools]
 packages = ["xyberos_auth"]
 
 [tool.setuptools.package-data]
-# PEP 561 marker: ships inline type annotations to consumers.
-# Setuptools' default already includes it; declared explicitly so
-# the intent survives a change to that default.
 xyberos_auth = ["py.typed"]
 
 [tool.pytest.ini_options]

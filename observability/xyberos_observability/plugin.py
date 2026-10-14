@@ -1,91 +1,67 @@
-"""Observability plugin entry point (RFC-0019, M10).
+"""The same configuration through a ``Plugin``, for an application that composes in sections.
 
-Wires an :class:`~xyberos.events.EventRecorder` (with the configured exporters)
-into the app's ``EventBus``. Exporters are selected by name
-(``OBSERVABILITY_EXPORTERS`` = comma-separated ``otel``, ``prometheus``,
-``langfuse``, ``sentry``) or passed explicitly. With none configured the
-plugin registers nothing (logs a warning).
+A plugin is not required: :func:`~xyberos_observability.logs.configure_logging` is the explicit call
+a composition root can make on its own. Declaring the settings as a plugin's ``config_type`` is the
+other door to the same room, and it is the one an application that already composes in sections
+wants — ``[plugins.observability]`` in ``xyberos.toml``, ``XYBEROS_PLUGINS__OBSERVABILITY__LEVEL`` in
+the environment, or an explicit mapping, with the precedence every other plugin section has.
 """
 
 from __future__ import annotations
 
-import os
-from typing import Any, cast
+from typing import TYPE_CHECKING, ClassVar
 
-from xyberos.contracts import Plugin
-from xyberos.events import EventRecorder, Exporter
+from xyberos.plugins.protocol import Plugin
 
-from .langfuse import LangfuseExporter
-from .otel import OpenTelemetryExporter
-from .prometheus import PrometheusExporter
-from .sentry import SentryExporter
+from xyberos_observability.observability import Observability
+from xyberos_observability.settings import ObservabilitySettings
 
-EXPORTER_BUILDERS: dict[str, Any] = {
-    "otel": lambda: OpenTelemetryExporter(),
-    "prometheus": lambda: PrometheusExporter(),
-    "langfuse": lambda: LangfuseExporter(),
-    "sentry": lambda: SentryExporter(),
-}
+if TYPE_CHECKING:
+    from xyberos.app import App
+
+__all__ = ["ObservabilityPlugin"]
 
 
-class ObservabilityPlugin(Plugin):
-    """Subscribes an ``EventRecorder`` with the configured exporters."""
+class ObservabilityPlugin(Plugin[ObservabilitySettings]):
+    """Configure one logging handler and provide :class:`Observability`, from a plugin section.
 
-    def __init__(
-        self,
-        exporters: list[Exporter] | None = None,
-        *,
-        env_prefix: str = "OBSERVABILITY",
-    ) -> None:
-        self._exporters_arg = exporters
-        self._env_prefix = env_prefix
-        self._recorder: EventRecorder | None = None
+    .. code-block:: python
+
+        app.add_plugin(ObservabilityPlugin())  # reads [plugins.observability]
+        app.add_plugin(ObservabilityPlugin(), config={"level": "DEBUG", "service": "checkout"})
+
+    The handler is installed while the plugin registers and removed when the application stops; the
+    :class:`Observability` object is a provider, so a service that wants to open a span of its own
+    asks for it by type instead of reaching for a module-level singleton.
+    """
+
+    name: ClassVar[str] = "observability"
+    api_version: ClassVar[str] = "1"
+    requires: ClassVar[tuple[str, ...]] = ()
+    config_type: ClassVar[type[object] | None] = ObservabilitySettings
+
+    def __init__(self) -> None:
+        self._observability: Observability | None = None
 
     @property
-    def name(self) -> str:
-        return "observability"
+    def observability(self) -> Observability | None:
+        """The object this plugin built, once it has registered."""
+        return self._observability
 
-    def exporters(self) -> list[Exporter]:
-        if self._exporters_arg is not None:
-            return list(self._exporters_arg)
-        names = [
-            name.strip().lower()
-            for name in os.getenv(f"{self._env_prefix}_EXPORTERS", "").split(",")
-            if name.strip()
-        ]
-        built: list[Exporter] = []
-        for name in names:
-            if name not in EXPORTER_BUILDERS:
-                raise ValueError(
-                    f"unknown exporter '{name}' (choose from {sorted(EXPORTER_BUILDERS)})"
-                )
-            built.append(EXPORTER_BUILDERS[name]())
-        return built
-
-    def register(self, kernel: object) -> None:
+    def register(self, app: App, config: ObservabilitySettings) -> None:
+        observability = Observability(config)
+        observability.configure_logging()
         try:
-            exporters = self.exporters()
-        except ValueError as exc:
-            logger = getattr(kernel, "logger", None)
-            if logger is not None and callable(getattr(logger, "warning", None)):
-                logger.warning("observability plugin not configured: %s", exc)
-            return
-        if not exporters:
-            logger = getattr(kernel, "logger", None)
-            if logger is not None and callable(getattr(logger, "warning", None)):
-                logger.warning(
-                    "observability plugin not configured: set %s_EXPORTERS", self._env_prefix
-                )
-            return
-        events = cast(Any, kernel).resolve("events")
-        self._recorder = EventRecorder(exporters=exporters).subscribe_to(events)
-        cast(Any, kernel).register("observability", self._recorder, replace=True)
+            app.provide(Observability, instance=observability)
+        except Exception:
+            # A handler left behind by a registration that failed would be a leak the application
+            # cannot even name, since it never received the object that owns it.
+            observability.shutdown()
+            raise
+        self._observability = observability
 
-    def unregister(self, kernel: object) -> None:
-        if self._recorder is not None:
-            self._recorder.unsubscribe_from(cast(Any, kernel).resolve("events"))
-            self._recorder = None
-
-
-#: Auto-discovered by ``app.load_entry_points()``.
-plugin = ObservabilityPlugin()
+    async def stop(self) -> None:
+        """Remove the handler and shut the tracer provider down."""
+        observability, self._observability = self._observability, None
+        if observability is not None:
+            observability.shutdown()

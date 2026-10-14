@@ -4,30 +4,23 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "xyberos-observability"
-version = "0.1.2"
-description = "Observability exporters plugin (RFC-0019, M10): OTel, Prometheus, Langfuse, Sentry as thin EventBus exporters"
+version = "0.2.0"
+description = "A logging handler and OpenTelemetry spans for Xyberos, fed by the runtime's own event sink"
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "Apache-2.0"}
-dependencies = ["xyberos>=1.0,<2"]
-keywords = ["xyberos", "plugin", "observability", "opentelemetry", "prometheus", "langfuse", "sentry"]
+dependencies = ["xyberos>=2,<3", "opentelemetry-api>=1.20,<2", "opentelemetry-sdk>=1.20,<2"]
+keywords = ["xyberos", "observability", "opentelemetry", "tracing", "spans", "logging"]
 
-[project.optional-dependencies]
-otel = ["opentelemetry-sdk"]
-prometheus = ["prometheus-client"]
-sentry = ["sentry-sdk"]
-test = ["pytest"]
-
-[project.entry-points."xyberos.plugins"]
-observability = "xyberos_observability.plugin:plugin"
+[project.urls]
+Documentation = "https://docs.xyberos.com/"
+Repository = "https://github.com/xyberos/xyberos-plugins"
+Issues = "https://github.com/xyberos/xyberos-plugins/issues"
 
 [tool.setuptools]
 packages = ["xyberos_observability"]
 
 [tool.setuptools.package-data]
-# PEP 561 marker: ships inline type annotations to consumers.
-# Setuptools' default already includes it; declared explicitly so
-# the intent survives a change to that default.
 xyberos_observability = ["py.typed"]
 
 [tool.pytest.ini_options]

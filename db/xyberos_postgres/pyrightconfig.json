@@ -1,0 +1,4 @@
+{
+  "typeCheckingMode": "strict",
+  "exclude": ["**/__pycache__", "**/dist", "**/*.egg-info"]
+}

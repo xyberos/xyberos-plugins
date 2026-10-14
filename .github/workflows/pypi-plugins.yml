@@ -20,25 +20,31 @@ name: pypi-plugins
 #     Each project can only receive uploads from the matching matrix job.
 #
 # Triggers:
-#   - Manual (workflow_dispatch): publish all, or a comma-separated subset.
+#   - Manual (workflow_dispatch): publish all, or a comma-separated subset of
+#     directories, where each entry is a subject folder or one distribution
+#     inside one.
 #   - Tag push:
-#       v0.1.0            -> publish ALL plugins
-#       github/v0.1.0     -> publish only the "github" plugin
+#       v0.1.0                      -> publish every distribution
+#       github/v0.1.0               -> publish the "github" distribution
+#       db/v0.1.0                   -> publish every distribution under "db/"
+#       db/xyberos_postgres/v0.1.0  -> publish one distribution inside "db/"
 
 on:
   workflow_dispatch:
     inputs:
       plugins:
         description: >-
-          Comma-separated plugin directories to publish
-          (e.g. "github,http-api"). Leave empty to publish ALL plugins.
+          Comma-separated directories to publish, each a subject folder or one
+          distribution inside one (e.g. "db,github,storage/xyberos_storage").
+          Leave empty to publish every distribution.
         required: false
         type: string
         default: ''
   push:
     tags:
-      - 'v*'      # e.g. v0.1.0       -> all plugins
-      - '*/v*'    # e.g. github/v0.1.0 -> one plugin
+      - 'v*'        # e.g. v0.1.0                     -> every distribution
+      - '*/v*'      # e.g. github/v0.1.0              -> one distribution
+      - '*/*/v*'    # e.g. db/xyberos_postgres/v0.1.0 -> one distribution
 
 permissions:
   contents: read
@@ -68,38 +74,59 @@ jobs:
           python - <<'PYEOF'
           import json
           import os
+          import pathlib
 
-          all_plugins = [
-              "auth", "db", "discord", "documents", "github", "gitlab",
-              "http-api", "jira", "linear", "llm-providers", "mcp",
-              "notion", "observability", "queues", "slack", "storage",
-              "stt", "tts", "vector-faiss", "vector-qdrant", "vector-redis",
-              "vision", "web-search",
-          ]
+          def discover():
+              """Every directory that ships a distribution.
+
+              A plugin folder carries its distribution directly (`github/`), and a
+              subject folder carries one or more inside it (`db/xyberos_postgres/`).
+              Discovered rather than listed, because a list written by hand misses the
+              distribution nobody remembered to add to it.
+              """
+              found = set()
+              for pattern in ("*/pyproject.toml", "*/*/pyproject.toml"):
+                  for path in pathlib.Path(".").glob(pattern):
+                      directory = path.parent.as_posix().removeprefix("./")
+                      if not directory.startswith("."):
+                          found.add(directory)
+              return sorted(found)
+
+          all_plugins = discover()
+          print(f"discovered: {all_plugins}")
+
+          def under(prefix):
+              return [d for d in all_plugins if d == prefix or d.startswith(prefix + "/")]
 
           event = os.environ["EVENT_NAME"]
           ref = os.environ["GITHUB_REF"]
           dispatch_input = os.environ.get("DISPATCH_INPUT", "")
 
           if event == "workflow_dispatch":
-              # Manual run: empty input = all plugins; otherwise only the
-              # named ones. Fall back to all if nothing valid was given.
+              # Manual run: empty input = every distribution; otherwise the named
+              # directories, where naming a subject publishes what is inside it.
               if not dispatch_input.strip():
                   selected = all_plugins
               else:
-                  chosen = [p.strip() for p in dispatch_input.split(",") if p.strip()]
-                  selected = [p for p in all_plugins if p in chosen]
+                  chosen = [p.strip().strip("/") for p in dispatch_input.split(",") if p.strip()]
+                  selected = sorted({d for name in chosen for d in under(name)})
                   if not selected:
-                      print("No valid plugins matched; publishing all.")
+                      print("No valid directory matched; publishing every distribution.")
                       selected = all_plugins
           else:
-              # Tag push: refs/tags/github/v0.1.0 -> github ; refs/tags/v0.1.0 -> all
+              # Tag push: the tag names a directory, and the version is its last segment.
+              #   db/xyberos_postgres/v0.1.0 -> db/xyberos_postgres
+              #   db/v0.1.0                  -> every distribution under db/
+              #   v0.1.0                     -> every distribution
               tag = ref[len("refs/tags/"):]
-              if "/" in tag:
-                  plugin = tag.split("/", 1)[0]
-                  selected = [plugin] if plugin in all_plugins else all_plugins
-              else:
+              if "/" not in tag:
                   selected = all_plugins
+              else:
+                  prefix = tag.rsplit("/", 1)[0]
+                  selected = under(prefix)
+                  if not selected:
+                      print(f"No distribution under {prefix!r}; publishing every distribution.")
+                      selected = all_plugins
 
           with open(os.environ["GITHUB_OUTPUT"], "a") as f:
               f.write("plugins=" + json.dumps(selected) + "\n")
@@ -148,17 +175,34 @@ jobs:
           sys.exit(0 if in_wheel and in_sdist else 1)
           PYEOF
 
-      # Blocking: every package is now strict-clean (verified 23/23), so a
-      # type regression fails the release instead of shipping. Uses the
-      # repo-root pyrightconfig.json (strict). If pyright/PyPI are ever
-      # unreachable this will block publication; re-add `continue-on-error:
-      # true` to downgrade it to advisory-only.
-      - name: Type check plugin (strict)
+      # Blocking: every distribution is strict-clean (verified 23/23), so a
+      # type regression fails the release instead of shipping. Both the core
+      # range and the import root are read from the distribution's own
+      # pyproject.toml: this repository now holds two lines, and a 2.x
+      # distribution checked against 1.x would be checked against code it never
+      # runs on. A 2.x distribution cannot resolve its range before the core
+      # release exists, and failing here is the correct ordering rather than a
+      # gap. If pyright or PyPI are ever unreachable this will block
+      # publication; re-add `continue-on-error: true` to downgrade it to
+      # advisory-only.
+      - name: Type check distribution (strict)
         working-directory: ${{ matrix.plugin }}
         run: |
-          python -m pip install pyright "xyberos>=1.0,<2"
-          package=$(python -c "import pathlib, tomllib; print(tomllib.loads(pathlib.Path('pyproject.toml').read_text())['tool']['setuptools']['packages'][0])")
-          python -m pyright "$package"
+          python - <<'PYEOF' >> "$GITHUB_ENV"
+          import pathlib
+          import tomllib
+
+          data = tomllib.loads(pathlib.Path("pyproject.toml").read_text())
+          project = data["project"]
+          # What the distribution declares is what its users install, so it is what its types are
+          # checked against.
+          declared = [item for item in project.get("dependencies", []) if item.startswith("xyberos")]
+          print("CORE_REQUIREMENT=" + (declared[0] if declared else "xyberos>=1.0"))
+          packages = data.get("tool", {}).get("setuptools", {}).get("packages")
+          print("IMPORT_ROOT=" + (packages[0] if packages else project["name"].replace("-", "_")))
+          PYEOF
+          python -m pip install pyright "$CORE_REQUIREMENT"
+          python -m pyright "$IMPORT_ROOT"
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1

@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "xyberos-storage-s3"
+version = "0.1.0"
+description = "A Storage provider for S3-compatible object stores, proved against the shipped conformance suite"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "Apache-2.0"}
+dependencies = ["xyberos>=2,<3", "aioboto3>=13,<16"]
+keywords = ["xyberos", "s3", "object-storage", "storage", "provider", "minio", "aioboto3"]
+
+[project.urls]
+Documentation = "https://docs.xyberos.com/"
+Repository = "https://github.com/xyberos/xyberos-plugins"
+Issues = "https://github.com/xyberos/xyberos-plugins/issues"
+
+[tool.setuptools]
+packages = ["xyberos_storage_s3"]
+
+[tool.setuptools.package-data]
+xyberos_storage_s3 = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

@@ -1,30 +1,26 @@
-"""MCP plugin (RFC-0019, M3): client + server.
+"""Serve an application's registered tools to an MCP client.
 
-Speaks the Model Context Protocol (JSON-RPC 2.0) over **stdio** (local servers)
-and **streamable HTTP** (remote servers) using only the standard library. The
-**client** half (``McpClient`` / ``McpPlugin``) turns each configured server's
-``tools/list`` into one typed :class:`~xyberos.contracts.Tool` per server tool.
-The **server** half (``build_server`` / ``expose``) turns a Xyberos app's
-registered tools into an MCP server for external clients (requires the
-``[mcp]`` extra).
+The other half of the seam ``xyberos.mcp`` opens. The core package consumes another server's tools;
+this package offers an application's tools *to* a client, so one name answers one question and the
+client is not here — nor is a stdio transport, which stays withheld until the project owner
+approves one.
+
+    from xyberos import App
+    from xyberos.ai import Tool, ToolSpec
+    from xyberos_mcp import expose
+
+    app = App()
+    expose(app, [Tool(spec=ToolSpec(name="search", ...), handler=search)])
+
+``expose`` registers a ``POST`` route (``/mcp`` unless another path is named) that speaks JSON-RPC
+2.0 over the core HTTP adapter, and returns the :class:`McpServer` that answers on it. What the
+route does not do is authenticate the caller: the framework ships no identity or authorization model
+([ADR 0014]), so verification belongs in front of the route, as adapter middleware or at the edge.
+
+[ADR 0014]: https://github.com/xyberos/xyberos2.0/blob/master/docs/adr/0014-no-identity-or-authorization-model.md
 """
 
-from .client import McpClient
-from .errors import McpError, McpSecurityError, McpTimeoutError
-from .plugin import McpPlugin
-from .registry import ServerConfig, load_servers
-from .security import ServerAllowlist
-from .server import build_server, expose
+from xyberos_mcp.protocol import SUPPORTED_PROTOCOL_VERSION
+from xyberos_mcp.server import SERVER_NAME, McpServer, expose
 
-__all__ = [
-    "McpClient",
-    "McpError",
-    "McpPlugin",
-    "McpSecurityError",
-    "McpTimeoutError",
-    "ServerAllowlist",
-    "ServerConfig",
-    "build_server",
-    "expose",
-    "load_servers",
-]
+__all__ = ["SERVER_NAME", "SUPPORTED_PROTOCOL_VERSION", "McpServer", "expose"]
