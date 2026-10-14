@@ -9,7 +9,11 @@ description = "A DatabaseProvider for PostgreSQL, proved against the shipped con
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "Apache-2.0"}
-dependencies = ["xyberos>=2,<3", "asyncpg>=0.29,<1", "sqlalchemy>=2.0,<2.1"]
+dependencies = ["xyberos[database]>=2,<3", "asyncpg>=0.29,<1", "sqlalchemy>=2.0,<2.1"]
+# The `database` extra is not for the provider's own use: `xyberos.database.testing` is where the
+# conformance suite lives, and importing it needs the extra's dependencies. Declaring it is what keeps
+# the suite runnable by whoever installs this package — the compatibility job included, which installs
+# the core and this distribution and nothing else.
 keywords = ["xyberos", "postgres", "postgresql", "database", "provider"]
 
 [project.urls]
