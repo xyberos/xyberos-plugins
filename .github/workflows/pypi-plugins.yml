@@ -225,11 +225,17 @@ jobs:
           print("IMPORT_ROOT=" + (packages[0] if packages else project["name"].replace("-", "_")))
           PYEOF
           # The distribution is installed, not only its source tree checked. Strict mode resolves every
-          # import, so a dependency that is not present is a `reportMissingImports` error: checking a
-          # distribution against the core alone fails on `jinja2`, `sqlalchemy`, or any other library it
-          # declares. Installing it also puts the core range it declares in front of the checker, so the
-          # range is proved rather than assumed.
-          python -m pip install pyright -e .
+          # import, so a dependency that is not present is an error: checking a distribution against the
+          # core alone fails on `jinja2`, `sqlalchemy`, or any other library it declares. Installing it
+          # also puts the core range it declares in front of the checker, so the range is proved rather
+          # than assumed.
+          #
+          # pytest is installed because this step type-checks the tests as well as the package: a
+          # distribution's own pyright config states no `include`, so the checker's project is the whole
+          # directory. Any other import only the tests need therefore has to be a declared dependency of
+          # the distribution — which is why `xyberos-observability` declares the `http` extra that its
+          # request-span test and its README example use.
+          python -m pip install pyright pytest -e .
           python -m pyright "$IMPORT_ROOT"
 
       - name: Publish to PyPI
