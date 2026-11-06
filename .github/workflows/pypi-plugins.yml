@@ -35,7 +35,7 @@ on:
       plugins:
         description: >-
           Comma-separated directories to publish, each a subject folder or one
-          distribution inside one (e.g. "db,github,storage/xyberos_storage").
+          distribution inside one (e.g. "db,storage/xyberos_storage_s3").
           Leave empty to publish every distribution.
         required: false
         type: string
@@ -205,15 +205,13 @@ jobs:
           PYEOF
 
       # Blocking: a type regression fails the release instead of shipping. The distribution is installed
-      # before it is checked, so strict mode sees the dependencies and the core range it declares — this
-      # repository holds two lines, and a 2.x distribution checked against 1.x would be checked against
-      # code it never runs on. A 2.x distribution cannot resolve its range before the core release exists,
-      # and failing here is the correct ordering rather than a gap. If pyright or PyPI are ever unreachable
-      # this will block publication; re-add `continue-on-error: true` to downgrade it to advisory-only.
+      # before it is checked, so strict mode sees the dependencies and core version selected by its
+      # declared range. If pyright or PyPI are ever unreachable this will block publication; re-add
+      # `continue-on-error: true` to downgrade it to advisory-only.
       #
       # The check is scoped to the package rather than the whole directory, which the distribution's own
-      # metadata names. The tests are each package's own CI's business: three of the seven need a live
-      # service to run at all, and their type-cleanliness is a separate job rather than a publish gate.
+      # metadata names. Package tests are separate from this publish gate; some require a live service,
+      # while type-cleanliness is checked here.
       # Note the assignment below: a variable written to `$GITHUB_ENV` is only in scope for *later* steps,
       # so the import root is computed in the shell that uses it.
       - name: Type check distribution (strict)
