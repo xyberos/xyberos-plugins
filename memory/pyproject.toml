@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "xyberos-memory"
+version = "0.1.0"
+description = "Persistent conversation history and scoped facts over Xyberos DatabaseProvider"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "Apache-2.0"}
+dependencies = ["xyberos[database]>=2,<3"]
+keywords = ["xyberos", "memory", "conversation", "database", "context"]
+
+[project.optional-dependencies]
+test = ["pytest>=8,<10"]
+
+[project.urls]
+Documentation = "https://docs.xyberos.com/"
+Repository = "https://github.com/xyberos/xyberos-plugins"
+Issues = "https://github.com/xyberos/xyberos-plugins/issues"
+
+[tool.setuptools]
+packages = ["xyberos_memory"]
+
+[tool.setuptools.package-data]
+xyberos_memory = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

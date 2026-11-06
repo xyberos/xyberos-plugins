@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "xyberos-knowledge"
+version = "0.1.0"
+description = "Document chunking, embedding, retrieval, and citations over an application-supplied vector store"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "Apache-2.0"}
+dependencies = ["xyberos>=2,<3"]
+keywords = ["xyberos", "knowledge", "retrieval", "embeddings", "vector", "citations"]
+
+[project.optional-dependencies]
+test = ["pytest>=8,<10"]
+
+[project.urls]
+Documentation = "https://docs.xyberos.com/"
+Repository = "https://github.com/xyberos/xyberos-plugins"
+Issues = "https://github.com/xyberos/xyberos-plugins/issues"
+
+[tool.setuptools]
+packages = ["xyberos_knowledge"]
+
+[tool.setuptools.package-data]
+xyberos_knowledge = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

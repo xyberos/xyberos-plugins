@@ -1,8 +1,10 @@
 # Xyberos Plugins
 
-Standalone plugins implementing the [RFC-0019 integrations roadmap](RFC-0019-integrations-roadmap.md).
-Each folder is an independently installable plugin that plugs into the public
-`xyberos` API via the `xyberos.plugins` entry-point group.
+Standalone Xyberos integrations, including legacy 1.x plugins from the
+[RFC-0019 integrations roadmap](RFC-0019-integrations-roadmap.md) and 2.x packages built against
+the current public contracts. Each distribution is independently installable. The 1.x plugins use
+the `xyberos.plugins` entry-point group; 2.x packages follow the current line's explicit construction
+and provider contracts and do not register implicitly.
 
 ## Build order (as specified)
 
@@ -40,7 +42,7 @@ distribution written against this line carries its own config beside its
 
 ## What targets which line
 
-Most folders here still target the 1.x line and declare `xyberos>=1.0,<2`. Seven
+Most folders here still target the 1.x line and declare `xyberos>=1.0,<2`. Nine
 distributions target this line and declare `xyberos>=2,<3`:
 
 | Distribution | Directory | What it is |
@@ -52,6 +54,8 @@ distributions target this line and declare `xyberos>=2,<3`:
 | `xyberos-mcp` | [`mcp/`](mcp/) | a rewrite: the server direction only |
 | `xyberos-auth` | [`auth/`](auth/) | a rewrite: verification only |
 | `xyberos-observability` | [`observability/`](observability/) | a rewrite: a handler and spans |
+| `xyberos-memory` | [`memory/`](memory/) | persistent conversation history and scoped facts over `DatabaseProvider` |
+| `xyberos-knowledge` | [`knowledge/`](knowledge/) | document chunking, embeddings, retrieval, and citations over an application-supplied `VectorStore` |
 
 Three of those — `mcp/`, `auth/`, and `observability/` — are **rewrites in place**: the folder kept its
 name and its distribution, and the published 1.x release stays on the index while its source stays in
@@ -65,11 +69,9 @@ both runs two environments.
 
 Every distribution:
 
-- is a **standalone package** with its own `pyproject.toml` and an
-  `xyberos.plugins` entry point;
-- uses only the **public `xyberos` API** (`Tool` / `FunctionTool`,
-  `Knowledge` / `VectorStore` / `Memory` / `Plugin` contracts,
-  `utils.resilience.RateLimiter`, …);
+- is a **standalone package** with its own `pyproject.toml`;
+- uses only the **public `xyberos` API** for the line it declares. Legacy 1.x plugins use the
+  `xyberos.plugins` entry point; 2.x distributions use explicit provider and contract composition;
 - imports optional third-party dependencies **lazily** and raises a clear
   `ProviderError` when they are missing;
 - ships **tests** (optional-dep tests skip cleanly), **examples**, and a
@@ -84,6 +86,8 @@ pip install -e ./documents
 pip install -e ./vector-qdrant -e ./vector-faiss -e ./vector-redis
 pip install -e ./mcp -e ./web-search
 pip install -e ./llm-providers/xyberos_llm_providers
+# current-line data capabilities
+pip install -e ./memory -e ./knowledge
 # community wave (M7) — install any subset
 pip install -e ./github -e ./gitlab -e ./slack -e ./discord -e ./notion -e ./jira -e ./linear
 # voice + vision (M8)
